@@ -17,6 +17,7 @@ using Windows.UI.Xaml.Navigation;
 
 namespace LyftUWP
 {
+    using Helpers;
     /// <summary>
     /// An empty page that can be used on its own or navigated to within a Frame.
     /// </summary>
@@ -25,6 +26,12 @@ namespace LyftUWP
         public MainPage()
         {
             this.InitializeComponent();
+        }
+
+        protected override void OnNavigatedTo(NavigationEventArgs e)
+        {
+            base.OnNavigatedTo(e);
+            Helpers.AuthHelper.GetAuthorizationCode();
         }
     }
 }
