@@ -31,7 +31,12 @@ namespace LyftUWP
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
-            Helpers.AuthHelper.GetAuthorizationCode();
+           
+        }
+
+        private void SignIn_Click(object sender, RoutedEventArgs e)
+        {
+            Helpers.AuthHelper.UserSignIn();
         }
     }
 }
