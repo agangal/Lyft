@@ -18,6 +18,7 @@ using Windows.UI.Xaml.Navigation;
 namespace LyftUWP
 {
     using Helpers;
+    using Pages;
     /// <summary>
     /// An empty page that can be used on its own or navigated to within a Frame.
     /// </summary>
@@ -34,9 +35,11 @@ namespace LyftUWP
            
         }
 
-        private void SignIn_Click(object sender, RoutedEventArgs e)
+        private async void SignIn_Click(object sender, RoutedEventArgs e)
         {
-            Helpers.AuthHelper.UserSignIn();
+            await Helpers.AuthHelper.UserSignIn();
+            Frame rootFrame = Window.Current.Content as Frame;
+            rootFrame.Navigate(typeof(RidesPage));
         }
     }
 }
