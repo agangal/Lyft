@@ -27,6 +27,10 @@ namespace LyftUWP.Helpers
                 Settings.AUTHORIZATION_CODE = splits[1];
                 System.Diagnostics.Debug.WriteLine(Settings.AUTHORIZATION_CODE);
             }
+            if (WebAuthResult.ResponseStatus == WebAuthenticationStatus.ErrorHttp)
+            {
+                return false;
+            }
             return true;
         }
 
@@ -45,10 +49,31 @@ namespace LyftUWP.Helpers
             }
             catch (Exception ex)
             {
-
+                return false;
             }
             return true;
         }
+
+
+        //public static async Task<bool> RefreshAccessToken()
+        //{
+        //    HttpClient httpClient = new HttpClient();
+        //    try
+        //    {
+        //        string content = "client_id=" + Settings.CLIENT_ID + "&client_secret=" + Settings.CLIENT_SECRET + "&redirect_uri=https%3A%2F%2Fashishgangal.com%2F&grant_type=authorization_code&state=" + Settings.STATE + "&code=" + Settings.AUTHORIZATION_CODE;
+        //        HttpStringContent stringcont = new HttpStringContent(content);
+        //        var bytearray = Encoding.ASCII.GetBytes(Settings.CLIENT_ID + ":" + Settings.CLIENT_SECRET);
+        //        httpClient.DefaultRequestHeaders.TryAppendWithoutValidation("Authorization", "Basic " + Convert.ToBase64String(bytearray));
+        //        stringcont.Headers.ContentType = new HttpMediaTypeHeaderValue("application/x-www-form-urlencoded");
+        //        var httpresponseMessage = await httpClient.PostAsync(new Uri(Settings.ACCESS_TOKEN_URI), stringcont);
+        //        string resp = await httpresponseMessage.Content.ReadAsStringAsync();
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return false;
+        //    }
+        //    return true;
+        //}
 
         public static async Task<bool> UserSignIn()
         {
