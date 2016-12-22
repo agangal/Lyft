@@ -39,7 +39,13 @@ namespace LyftUWP
         {
             if (!String.IsNullOrEmpty(Settings.AUTHORIZATION_CODE))
             {
-                await AuthHelper.GetAccessToken();
+                if (!await AuthHelper.CheckIfAccessTokenIsValid())
+                {
+                    if (!await AuthHelper.GetAccessToken())
+                    {
+                        await Helpers.AuthHelper.UserSignIn();
+                    }
+                }
             }
             else
             {
