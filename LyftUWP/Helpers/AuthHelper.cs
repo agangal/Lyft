@@ -45,9 +45,16 @@ namespace LyftUWP.Helpers
                 httpClient.DefaultRequestHeaders.TryAppendWithoutValidation("Authorization", "Basic " + Convert.ToBase64String(bytearray));
                 stringcont.Headers.ContentType = new HttpMediaTypeHeaderValue("application/x-www-form-urlencoded");
                 var httpresponseMessage = await httpClient.PostAsync(new Uri(URIHelper.ACCESS_TOKEN_URI), stringcont);
-                string resp = await httpresponseMessage.Content.ReadAsStringAsync();
-                var obj = JsonConvert.DeserializeObject<AccessTokenObject>(resp);
-                Settings.ACCESS_TOKEN = obj.access_token;
+                if (httpresponseMessage.IsSuccessStatusCode)
+                {
+                    string resp = await httpresponseMessage.Content.ReadAsStringAsync();
+                    var obj = JsonConvert.DeserializeObject<AccessTokenObject>(resp);
+                    Settings.ACCESS_TOKEN = obj.access_token;
+                }
+                else
+                {
+                    return false;
+                }
             }
             catch (Exception ex)
             {
@@ -56,7 +63,20 @@ namespace LyftUWP.Helpers
             return true;
         }
 
-
+        public static async Task<bool> CheckIfAccessTokenIsValid()
+        {
+            HttpClient httpclient = new HttpClient();
+            try
+            {
+                httpclient.DefaultRequestHeaders.Authorization = new Windows.Web.Http.Headers.HttpCredentialsHeaderValue("Bearer", Settings.ACCESS_TOKEN);
+                var httpresponsemessage = await httpclient.GetAsync(new Uri("https://api.lyft.com/v1/ridetypes?lat=37.7833&lng=-122.4167"));
+                return (httpresponsemessage.IsSuccessStatusCode);              
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }            
+        }
         //public static async Task<bool> RefreshAccessToken()
         //{
         //    HttpClient httpClient = new HttpClient();
