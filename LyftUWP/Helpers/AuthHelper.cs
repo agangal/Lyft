@@ -9,7 +9,7 @@ namespace LyftUWP.Helpers
 {
     using Windows.Web.Http;
     using Windows.Web.Http.Headers;
-
+    using Newtonsoft.Json;
     public class AuthHelper
     {
         public static async Task<bool> GetAuthorizationCode()
@@ -46,6 +46,8 @@ namespace LyftUWP.Helpers
                 stringcont.Headers.ContentType = new HttpMediaTypeHeaderValue("application/x-www-form-urlencoded");
                 var httpresponseMessage = await httpClient.PostAsync(new Uri(URIHelper.ACCESS_TOKEN_URI), stringcont);
                 string resp = await httpresponseMessage.Content.ReadAsStringAsync();
+                var obj = JsonConvert.DeserializeObject<AccessTokenObject>(resp);
+                Settings.ACCESS_TOKEN = obj.access_token;
             }
             catch (Exception ex)
             {
@@ -84,6 +86,14 @@ namespace LyftUWP.Helpers
                 return token_result;
             }
             return false;
+        }
+
+        public class AccessTokenObject
+        {
+            public string token_type { get; set; }
+            public string access_token { get; set; }
+            public int expires_in { get; set; }
+            public string scope { get; set; }
         }
     }
 }
