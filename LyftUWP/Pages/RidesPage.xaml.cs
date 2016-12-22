@@ -20,18 +20,23 @@ using Windows.UI.Xaml.Navigation;
 namespace LyftUWP.Pages
 {
     using LyftUWP.Helpers;
+    using Model;
+    using System.Collections.ObjectModel;
+
     /// <summary>
     /// An empty page that can be used on its own or navigated to within a Frame.
     /// </summary>
     public sealed partial class RidesPage : Page
     {
         private Geolocator _geolocator = null;
+        public ObservableCollection<TypeOfRide> TypeOfRideCollection { get; set; }
         public RidesPage()
         {
             this.InitializeComponent();
+            TypeOfRideCollection = new ObservableCollection<TypeOfRide>();
         }
 
-        protected override async void OnNavigatedTo(NavigationEventArgs e)
+        protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
             UpdateRideTypes();
@@ -51,8 +56,24 @@ namespace LyftUWP.Pages
                 //string eta = await URIHelper.GetRequest(URIHelper.ETA_URI + "?lat=" + pos.Coordinate.Point.Position.ToString() + "&lng=" + pos.Coordinate.Point.Position.Longitude.ToString());
                 string ride_type = await URIHelper.GetRequest(URIHelper.RIDE_TYPE_URI + "?lat=47.61" + "&lng=-122.33");
                 string eta = await URIHelper.GetRequest(URIHelper.ETA_URI + "?lat=47.61" + "&lng=-122.33");
-
-                // Get ETA for each
+                RootObjectRideType rridetype = RideType.DataDeserializerRideType(ride_type);
+                RootObjectEtaEstimate retaestimate = RideType.DataDeserializerEtaEstimate(eta);
+                for (int i = 0; i < rridetype.ride_types.Count; i++)
+                {
+                    for (int j = 0; j < retaestimate.eta_estimates.Count; j++)
+                    {
+                        if (retaestimate.eta_estimates[j].ride_type == rridetype.ride_types[i].ride_type)
+                        {
+                            rridetype.ride_types[i].eta_seconds = retaestimate.eta_estimates[j].eta_seconds;
+                            break;
+                        }
+                    }
+                }
+                TypeOfRideCollection.Clear();
+                for (int i = 0; i < rridetype.ride_types.Count; i++)
+                {
+                    TypeOfRideCollection.Add(rridetype.ride_types[i]);
+                }
             }
         }
 

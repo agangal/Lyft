@@ -10,13 +10,13 @@ namespace LyftUWP.Model
 
     public class RideType
     {
-        public RootObjectRideType DataDeserializerRideType(string data)
+        public static RootObjectRideType DataDeserializerRideType(string data)
         {
             RootObjectRideType rridetype = JsonConvert.DeserializeObject<RootObjectRideType>(data);
             return rridetype;
         }
 
-        public RootObjectEtaEstimate DataDeserializerEtaEstimate(string data)
+        public static RootObjectEtaEstimate DataDeserializerEtaEstimate(string data)
         {
             RootObjectEtaEstimate retaestimate = JsonConvert.DeserializeObject<RootObjectEtaEstimate>(data);
             return retaestimate;
@@ -38,6 +38,7 @@ namespace LyftUWP.Model
         public string ride_type { get; set; }
         public string display_name { get; set; }
         public string image_url { get; set; }
+        public int eta_seconds { get; set; }
         public PricingDetails pricing_details { get; set; }
         public int seats { get; set; }
     }
@@ -59,4 +60,6 @@ namespace LyftUWP.Model
     {
         public List<EtaEstimate> eta_estimates { get; set; }
     }
+
+
 }
