@@ -4,11 +4,11 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:LyftUWP.Pages"
     xmlns:data="using:LyftUWP.Model"
+    xmlns:Maps="using:Windows.UI.Xaml.Controls.Maps"
     xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
-
     <Page.Resources>
         <DataTemplate x:Key="RideTypeDataTemplate" x:DataType="data:TypeOfRide">
             <Grid>
@@ -42,6 +42,7 @@
             <ColumnDefinition Width="Auto"></ColumnDefinition>
             <ColumnDefinition Width="*"></ColumnDefinition>
         </Grid.ColumnDefinitions>
+        <Maps:MapControl x:Name="myMap" Grid.RowSpan="2" Grid.ColumnSpan="2" MapServiceToken="DAPntNl3nFQ77ZnQJ11j~UBZWS5WadayHUSUaVI_iMA~AhwF-6z9Ei6wQHxYd_eXHX4ma_b2FuZvrxgxTQs6gD-1aTmmfOp1T-Z-vghT2RMu"/>
         <Button x:Name="ShowRideTypes" HorizontalAlignment="Left" Grid.Row="1"
                 VerticalAlignment="Bottom" Margin="10" Content="Rides" 
                 Click="ShowRideTypes_Click"
@@ -56,6 +57,7 @@
                       VerticalAlignment="Bottom" 
                       x:Name="RideTypeListView"></ListView>
         </Grid>
+        
         
     </Grid>
 </Page>
