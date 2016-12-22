@@ -14,7 +14,7 @@ namespace LyftUWP.Helpers
     {
         public static async Task<bool> GetAuthorizationCode()
         {
-            string authurl = Settings.AUTHORIZATION_CODE_URI + "?client_id=" + Settings.CLIENT_ID + "&response_type=code&scope=public&state=" + Settings.STATE;
+            string authurl = URIHelper.AUTHORIZATION_CODE_URI + "?client_id=" + Settings.CLIENT_ID + "&response_type=code&scope=public&state=" + Settings.STATE;
             Uri StartUri = new Uri(authurl);
             Uri EndUri = new Uri("https://ashishgangal.com/");
             WebAuthenticationResult WebAuthResult = await WebAuthenticationBroker.AuthenticateAsync(WebAuthenticationOptions.None, StartUri, EndUri);
@@ -44,7 +44,7 @@ namespace LyftUWP.Helpers
                 var bytearray = Encoding.ASCII.GetBytes(Settings.CLIENT_ID + ":"+ Settings.CLIENT_SECRET);
                 httpClient.DefaultRequestHeaders.TryAppendWithoutValidation("Authorization", "Basic " + Convert.ToBase64String(bytearray));
                 stringcont.Headers.ContentType = new HttpMediaTypeHeaderValue("application/x-www-form-urlencoded");
-                var httpresponseMessage = await httpClient.PostAsync(new Uri(Settings.ACCESS_TOKEN_URI), stringcont);
+                var httpresponseMessage = await httpClient.PostAsync(new Uri(URIHelper.ACCESS_TOKEN_URI), stringcont);
                 string resp = await httpresponseMessage.Content.ReadAsStringAsync();
             }
             catch (Exception ex)
