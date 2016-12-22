@@ -22,7 +22,7 @@ namespace LyftUWP.Pages
     using LyftUWP.Helpers;
     using Model;
     using System.Collections.ObjectModel;
-
+    
     /// <summary>
     /// An empty page that can be used on its own or navigated to within a Frame.
     /// </summary>
@@ -110,6 +110,18 @@ namespace LyftUWP.Pages
             if (position != null)
             {
                 System.Diagnostics.Debug.WriteLine(position.Coordinate.Point.Position.Latitude.ToString() + ", " + position.Coordinate.Point.Position.Longitude.ToString());
+            }
+        }
+
+        private void ShowRideTypes_Click(object sender, RoutedEventArgs e)
+        {
+           if (RideTypeListViewGrid.Visibility == Visibility.Visible)
+            {
+                RideTypeListViewGrid.Visibility = Visibility.Collapsed;
+            }
+           else
+            {
+                RideTypeListViewGrid.Visibility = Visibility.Visible;
             }
         }
     }

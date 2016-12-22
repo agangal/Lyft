@@ -4,6 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:LyftUWP.Pages"
     xmlns:data="using:LyftUWP.Model"
+    xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
@@ -13,10 +14,22 @@
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"></ColumnDefinition>
-                    <ColumnDefinition Width="Auto"></ColumnDefinition>
-                    <ColumnDefinition Width="Auto"></ColumnDefinition>
+                    <ColumnDefinition Width="*"></ColumnDefinition>
+                    <ColumnDefinition Width="*"></ColumnDefinition>
                 </Grid.ColumnDefinitions>
-                
+                <controls:ImageEx 
+                    IsCacheEnabled="True"
+                    Source="{Binding image_url}"
+                    Stretch="UniformToFill" Height="35"
+                    PlaceholderSource="/Assets/Photos/ImageExPlaceholder.jpg"
+                    PlaceholderStretch="UniformToFill"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"/>
+                <StackPanel Orientation="Vertical" Grid.Column="1">
+                    <TextBlock Text="{x:Bind display_name}" Foreground="Black" FontSize="14" Margin="5,0,5,0"></TextBlock>
+                    <TextBlock Text="{x:Bind seats}" Foreground="Black" FontSize="10" Margin="5,0,5,0"></TextBlock>
+                </StackPanel>
+                <TextBlock Text="{x:Bind eta_seconds}" Foreground="Black" Grid.Column="2" FontSize="14" Margin="5,0,0,0"></TextBlock>
             </Grid>
         </DataTemplate>
     </Page.Resources>
@@ -25,13 +38,24 @@
             <RowDefinition Height="*"></RowDefinition>
             <RowDefinition Height="Auto"></RowDefinition>
         </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"></ColumnDefinition>
+            <ColumnDefinition Width="*"></ColumnDefinition>
+        </Grid.ColumnDefinitions>
         <Button x:Name="ShowRideTypes" HorizontalAlignment="Left" Grid.Row="1"
                 VerticalAlignment="Bottom" Margin="10" Content="Rides" 
+                Click="ShowRideTypes_Click"
                 Foreground="Black" Background="Transparent"></Button>
-        <ListView Grid.Row="0" HorizontalAlignment="Left"
-                  ItemsSource="{x:Bind TypeOfRideCollection}"
-                  ItemTemplate="{StaticResource RideTypeDataTemplate}"
-                  VerticalAlignment="Bottom" 
-                  x:Name="RideTypeListView"></ListView>
+        <Grid Grid.Column="0" Grid.Row="0" 
+              Visibility="Collapsed" x:Name="RideTypeListViewGrid"
+              HorizontalAlignment="Left" VerticalAlignment="Bottom"
+              BorderBrush="#e6e6e6" BorderThickness="1" CornerRadius="2">
+            <ListView ItemsSource="{x:Bind TypeOfRideCollection}"
+                      Grid.Column="0"
+                      ItemTemplate="{StaticResource RideTypeDataTemplate}"
+                      VerticalAlignment="Bottom" 
+                      x:Name="RideTypeListView"></ListView>
+        </Grid>
+        
     </Grid>
 </Page>
