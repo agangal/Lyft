@@ -37,7 +37,14 @@ namespace LyftUWP
 
         private async void SignIn_Click(object sender, RoutedEventArgs e)
         {
-            await Helpers.AuthHelper.UserSignIn();
+            if (!String.IsNullOrEmpty(Settings.AUTHORIZATION_CODE))
+            {
+                await AuthHelper.GetAccessToken();
+            }
+            else
+            {
+                await Helpers.AuthHelper.UserSignIn();
+            }
             Frame rootFrame = Window.Current.Content as Frame;
             rootFrame.Navigate(typeof(RidesPage));
         }
