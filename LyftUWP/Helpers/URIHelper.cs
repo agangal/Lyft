@@ -7,6 +7,7 @@ using Windows.Storage;
 
 namespace LyftUWP.Helpers
 {
+    using Windows.Web.Http;
     public class URIHelper
     {
         public static string ACCESS_TOKEN_URI
@@ -39,6 +40,25 @@ namespace LyftUWP.Helpers
         {
             get { return ApplicationData.Current.LocalSettings.Values["ETA_URI_LASTUSED"].ToString(); }
             set { ApplicationData.Current.LocalSettings.Values["ETA_URI_LASTUSED"] = value; }
+        }
+
+        public static async Task<string> GetRequest(string api)
+        {
+            HttpClient httpclient = new HttpClient();
+            try
+            {
+                httpclient.DefaultRequestHeaders.Authorization = new Windows.Web.Http.Headers.HttpCredentialsHeaderValue("Bearer", Settings.ACCESS_TOKEN);
+                var httpresponsemessage = await httpclient.GetAsync(new Uri(api));
+                if (httpresponsemessage.IsSuccessStatusCode)
+                {
+                    return (await httpresponsemessage.Content.ReadAsStringAsync());
+                }
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+            return null;
         }
     }
 }
