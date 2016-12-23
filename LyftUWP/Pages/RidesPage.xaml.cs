@@ -124,5 +124,10 @@ namespace LyftUWP.Pages
                 RideTypeListViewGrid.Visibility = Visibility.Visible;
             }
         }
+
+        private void PickupAddressTextBlock_Tapped(object sender, TappedRoutedEventArgs e)
+        {
+
+        }
     }
 }

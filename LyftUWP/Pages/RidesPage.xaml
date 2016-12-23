@@ -13,9 +13,9 @@
         <DataTemplate x:Key="RideTypeDataTemplate" x:DataType="data:TypeOfRide">
             <Grid>
                 <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"></ColumnDefinition>
                     <ColumnDefinition Width="*"></ColumnDefinition>
-                    <ColumnDefinition Width="*"></ColumnDefinition>
-                    <ColumnDefinition Width="*"></ColumnDefinition>
+                    <ColumnDefinition Width="Auto"></ColumnDefinition>
                 </Grid.ColumnDefinitions>
                 <controls:ImageEx 
                     IsCacheEnabled="True"
@@ -25,7 +25,7 @@
                     PlaceholderStretch="UniformToFill"
                     HorizontalAlignment="Center"
                     VerticalAlignment="Center"/>
-                <StackPanel Orientation="Vertical" Grid.Column="1">
+                <StackPanel Orientation="Vertical" Grid.Column="1" HorizontalAlignment="Stretch">
                     <TextBlock Text="{x:Bind display_name}" Foreground="Black" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="14" Margin="5,0,5,0"></TextBlock>
                     <TextBlock Text="{x:Bind seats}" Foreground="Black" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="10" Margin="5,0,5,0"></TextBlock>
                 </StackPanel>
@@ -37,16 +37,14 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="*"></RowDefinition>
             <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto"></ColumnDefinition>
             <ColumnDefinition Width="*"></ColumnDefinition>
         </Grid.ColumnDefinitions>
         <Maps:MapControl x:Name="myMap" Grid.RowSpan="2" Grid.ColumnSpan="2" MapServiceToken="DAPntNl3nFQ77ZnQJ11j~UBZWS5WadayHUSUaVI_iMA~AhwF-6z9Ei6wQHxYd_eXHX4ma_b2FuZvrxgxTQs6gD-1aTmmfOp1T-Z-vghT2RMu"/>
-        <Button x:Name="ShowRideTypes" HorizontalAlignment="Left" Grid.Row="1"
-                VerticalAlignment="Bottom" Margin="10" Content="Rides" 
-                Click="ShowRideTypes_Click"
-                Foreground="Black" Background="Transparent"></Button>
+
         <Grid Grid.Column="0" Grid.Row="0" 
               Visibility="Collapsed" x:Name="RideTypeListViewGrid"
               HorizontalAlignment="Left" VerticalAlignment="Bottom"
@@ -57,6 +55,42 @@
                       VerticalAlignment="Bottom" 
                       x:Name="RideTypeListView"></ListView>
         </Grid>
+
+        <Grid Grid.Row="1" Grid.ColumnSpan="2" Background="White" BorderBrush="#e6e6e6" BorderThickness="1" CornerRadius="4">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"></ColumnDefinition>
+                <ColumnDefinition Width="*"></ColumnDefinition>
+                <ColumnDefinition Width="Auto"></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+            <Button x:Name="ShowRideTypes" HorizontalAlignment="Center" Grid.Column="0"
+                VerticalAlignment="Bottom" Margin="10" Content="Rides" 
+                Click="ShowRideTypes_Click" 
+                Foreground="Black" Background="Transparent"></Button>
+            <Grid Grid.Column="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"></RowDefinition>
+                    <RowDefinition Height="Auto"></RowDefinition>
+                </Grid.RowDefinitions>
+                <TextBlock x:Name="PickupAddressTextBlock" Margin="5" FontSize="17" Text="2550 3rd Avenue" Tapped="PickupAddressTextBlock_Tapped"></TextBlock>
+                <TextBox x:Name="PickupAddressTextBox" Visibility="Collapsed" IsEnabled="False"></TextBox>
+                <TextBlock Text="Pickup Address" FontSize="12" Grid.Row="1"></TextBlock>
+            </Grid>
+            <Grid Grid.Column="2">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"></RowDefinition>
+                    <RowDefinition Height="Auto"></RowDefinition>
+                </Grid.RowDefinitions>
+                <TextBlock x:Name="EtaInMinutes" Text="3"></TextBlock>
+                <TextBlock Text="min" Grid.Row="1"></TextBlock>
+            </Grid>
+        </Grid>
+
+        <Grid Grid.Row="2" Background="#352384" CornerRadius="4"  Grid.ColumnSpan="2" BorderBrush="#e6e6e6" BorderThickness="1">
+            <Button x:Name="SetPickupButton" Foreground="White" BorderBrush="Transparent" Background="Transparent"
+                    HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                    Content="Set Pickup" CharacterSpacing="50" FontSize="25"></Button>
+        </Grid>
+       
         
         
     </Grid>
