@@ -51,29 +51,33 @@ namespace LyftUWP.Pages
             }
             else
             {
-                // Get type of rides available
-                //string ride_type = await URIHelper.GetRequest(URIHelper.RIDE_TYPE_URI + "?lat=" + pos.Coordinate.Point.Position.Latitude.ToString() + "&lng=" + pos.Coordinate.Point.Position.Longitude.ToString());
-                //string eta = await URIHelper.GetRequest(URIHelper.ETA_URI + "?lat=" + pos.Coordinate.Point.Position.ToString() + "&lng=" + pos.Coordinate.Point.Position.Longitude.ToString());
-                string ride_type = await URIHelper.GetRequest(URIHelper.RIDE_TYPE_URI + "?lat=47.61" + "&lng=-122.33");
-                string eta = await URIHelper.GetRequest(URIHelper.ETA_URI + "?lat=47.61" + "&lng=-122.33");
-                RootObjectRideType rridetype = RideType.DataDeserializerRideType(ride_type);
-                RootObjectEtaEstimate retaestimate = RideType.DataDeserializerEtaEstimate(eta);
-                for (int i = 0; i < rridetype.ride_types.Count; i++)
+                DownloadAvailableRideTypes(pos);
+            }
+        }
+
+        public async void DownloadAvailableRideTypes(Geoposition pos)
+        {
+            //string ride_type = await URIHelper.GetRequest(URIHelper.RIDE_TYPE_URI + "?lat=" + pos.Coordinate.Point.Position.Latitude.ToString() + "&lng=" + pos.Coordinate.Point.Position.Longitude.ToString());
+            //string eta = await URIHelper.GetRequest(URIHelper.ETA_URI + "?lat=" + pos.Coordinate.Point.Position.ToString() + "&lng=" + pos.Coordinate.Point.Position.Longitude.ToString());
+            string ride_type = await URIHelper.GetRequest(URIHelper.RIDE_TYPE_URI + "?lat=47.61" + "&lng=-122.33");
+            string eta = await URIHelper.GetRequest(URIHelper.ETA_URI + "?lat=47.61" + "&lng=-122.33");
+            RootObjectRideType rridetype = RideType.DataDeserializerRideType(ride_type);
+            RootObjectEtaEstimate retaestimate = RideType.DataDeserializerEtaEstimate(eta);
+            for (int i = 0; i < rridetype.ride_types.Count; i++)
+            {
+                for (int j = 0; j < retaestimate.eta_estimates.Count; j++)
                 {
-                    for (int j = 0; j < retaestimate.eta_estimates.Count; j++)
+                    if (retaestimate.eta_estimates[j].ride_type == rridetype.ride_types[i].ride_type)
                     {
-                        if (retaestimate.eta_estimates[j].ride_type == rridetype.ride_types[i].ride_type)
-                        {
-                            rridetype.ride_types[i].eta_seconds = retaestimate.eta_estimates[j].eta_seconds;
-                            break;
-                        }
+                        rridetype.ride_types[i].eta_seconds = retaestimate.eta_estimates[j].eta_seconds;
+                        break;
                     }
                 }
-                TypeOfRideCollection.Clear();
-                for (int i = 0; i < rridetype.ride_types.Count; i++)
-                {
-                    TypeOfRideCollection.Add(rridetype.ride_types[i]);
-                }
+            }
+            TypeOfRideCollection.Clear();
+            for (int i = 0; i < rridetype.ride_types.Count; i++)
+            {
+                TypeOfRideCollection.Add(rridetype.ride_types[i]);
             }
         }
 
