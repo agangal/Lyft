@@ -43,49 +43,75 @@
             <ColumnDefinition Width="Auto"></ColumnDefinition>
             <ColumnDefinition Width="*"></ColumnDefinition>
         </Grid.ColumnDefinitions>
-        <Maps:MapControl x:Name="RidesMap" Grid.RowSpan="2" Grid.ColumnSpan="2" MapServiceToken="DAPntNl3nFQ77ZnQJ11j~UBZWS5WadayHUSUaVI_iMA~AhwF-6z9Ei6wQHxYd_eXHX4ma_b2FuZvrxgxTQs6gD-1aTmmfOp1T-Z-vghT2RMu"/>
-
-        <Grid Grid.Column="0" Grid.Row="0" 
-              Visibility="Collapsed" x:Name="RideTypeListViewGrid"
+        <Maps:MapControl x:Name="RidesMap" LoadingStatusChanged="RidesMap_LoadingStatusChanged" Grid.RowSpan="3" Grid.ColumnSpan="2" MapServiceToken="DAPntNl3nFQ77ZnQJ11j~UBZWS5WadayHUSUaVI_iMA~AhwF-6z9Ei6wQHxYd_eXHX4ma_b2FuZvrxgxTQs6gD-1aTmmfOp1T-Z-vghT2RMu"/>
+        <Grid x:Name="LocationMarkerGrid" Grid.ColumnSpan="2" HorizontalAlignment="Center" VerticalAlignment="Center">
+            <Grid>
+                <Ellipse x:Name="LocationMarkerEllipseOuter" Height="31" Width="31" HorizontalAlignment="Center" VerticalAlignment="Center" Fill="White"></Ellipse>
+                <Ellipse x:Name="LocationMarkerEllipseInner" Height="30" Width="30" HorizontalAlignment="Center" VerticalAlignment="Center" Fill="#352384"></Ellipse>
+                <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="2">
+                </StackPanel>
+            </Grid>           
+        </Grid>
+        <Grid Grid.Column="0" Grid.Row="0" Background="White"
+              Visibility="Visible" x:Name="RideTypeListViewGrid"
               HorizontalAlignment="Left" VerticalAlignment="Bottom"
               BorderBrush="#e6e6e6" BorderThickness="1" CornerRadius="2">
             <ListView ItemsSource="{x:Bind TypeOfRideCollection}"
                       Grid.Column="0"
+                      ItemClick="RideTypeListView_ItemClick"
+                      IsItemClickEnabled="True"
                       ItemTemplate="{StaticResource RideTypeDataTemplate}"
                       VerticalAlignment="Bottom" 
                       x:Name="RideTypeListView"></ListView>
         </Grid>
 
-        <Grid Grid.Row="1" Grid.ColumnSpan="2" Background="White" BorderBrush="#e6e6e6" BorderThickness="1" CornerRadius="4">
+        <Grid Grid.Row="1" Grid.ColumnSpan="2" MinHeight="55" Background="White" BorderBrush="#e6e6e6" BorderThickness="1" CornerRadius="6" Margin="6">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"></ColumnDefinition>
                 <ColumnDefinition Width="*"></ColumnDefinition>
                 <ColumnDefinition Width="Auto"></ColumnDefinition>
             </Grid.ColumnDefinitions>
-            <Button x:Name="ShowRideTypes" HorizontalAlignment="Center" Grid.Column="0"
-                VerticalAlignment="Bottom" Margin="10" Content="Rides" 
-                Click="ShowRideTypes_Click" 
-                Foreground="Black" Background="Transparent"></Button>
+            <Grid x:Name="ShowRideTypesButtonGrid" Visibility="Visible">
+                <Ellipse Height="40" Width="40" HorizontalAlignment="Center" VerticalAlignment="Center" Fill="#474C62"></Ellipse>
+                <Button x:Name="ShowRideTypes" HorizontalAlignment="Center"
+                        Grid.Column="0"
+                        VerticalAlignment="Bottom" Margin="10" 
+                        Content="&#xE96E;" FontFamily="Segoe MDL2 Assets"
+                        Click="ShowRideTypes_Click" 
+                        Foreground="White" Background="Transparent"></Button>
+            </Grid>           
+            <Grid x:Name="SelectedRideGrid" Grid.Column="0" Visibility="Collapsed">
+                <Ellipse Height="45" Width="45" HorizontalAlignment="Center" VerticalAlignment="Center" Fill="#474C62"></Ellipse>
+                <controls:ImageEx 
+                    IsCacheEnabled="True"
+                    Stretch="UniformToFill" Height="35"
+                    x:Name="SelectedRideGridImageEx"
+                    PlaceholderStretch="UniformToFill"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"/>
+            </Grid>
             <Grid Grid.Column="1">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*"></RowDefinition>
                     <RowDefinition Height="Auto"></RowDefinition>
                 </Grid.RowDefinitions>
-                <TextBlock x:Name="PickupAddressTextBlock" Margin="5" FontSize="17" Text="2550 3rd Avenue" Tapped="PickupAddressTextBlock_Tapped"></TextBlock>
-                <TextBox x:Name="PickupAddressTextBox" Visibility="Collapsed" IsEnabled="False"></TextBox>
-                <TextBlock Text="Pickup Address" FontSize="12" Grid.Row="1"></TextBlock>
+                <TextBlock x:Name="PickupAddressTextBlock" Margin="5,2,5,2" 
+                           HorizontalAlignment="Left" VerticalAlignment="Center"
+                           FontSize="20" Text="2550 3rd Avenue" FontFamily="Arial" Tapped="PickupAddressTextBlock_Tapped"></TextBlock>
+                <TextBlock Text="Pickup Address" Margin="5,2,5,10" FontFamily="Arial"
+                           HorizontalAlignment="Left" VerticalAlignment="Center"
+                           Foreground="#738199" FontSize="14" Grid.Row="1"></TextBlock>
             </Grid>
             <Grid Grid.Column="2">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="*"></RowDefinition>
-                    <RowDefinition Height="Auto"></RowDefinition>
-                </Grid.RowDefinitions>
-                <TextBlock x:Name="EtaInMinutes" Text="3"></TextBlock>
-                <TextBlock Text="min" Grid.Row="1"></TextBlock>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"></ColumnDefinition>
+                    <ColumnDefinition Width="Auto"></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                <TextBlock x:Name="EtaInMinutes" Text="3" Margin="5,5,10,5" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="#738199"></TextBlock>                
             </Grid>
         </Grid>
 
-        <Grid Grid.Row="2" Background="#352384" CornerRadius="4"  Grid.ColumnSpan="2" BorderBrush="#e6e6e6" BorderThickness="1">
+        <Grid Grid.Row="2" Background="#352384" CornerRadius="6" Margin="6" Grid.ColumnSpan="2" BorderBrush="#e6e6e6" BorderThickness="1">
             <Button x:Name="SetPickupButton" Foreground="White" BorderBrush="Transparent" Background="Transparent"
                     HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
                     Content="Set Pickup" CharacterSpacing="50" FontSize="25"></Button>

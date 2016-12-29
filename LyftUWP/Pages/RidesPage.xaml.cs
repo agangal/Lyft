@@ -22,7 +22,8 @@ namespace LyftUWP.Pages
     using LyftUWP.Helpers;
     using Model;
     using System.Collections.ObjectModel;
-    
+    using Windows.Services.Maps;
+
     /// <summary>
     /// An empty page that can be used on its own or navigated to within a Frame.
     /// </summary>
@@ -36,18 +37,18 @@ namespace LyftUWP.Pages
             TypeOfRideCollection = new ObservableCollection<TypeOfRide>();
         }
 
-        protected override void OnNavigatedTo(NavigationEventArgs e)
+        protected override async void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
-            UpdateRideTypes();
+            Geoposition pos = await GetUserLocation();
+            UpdateRideTypes(pos);
         }
 
-        private async void UpdateRideTypes()
-        {
-            Geoposition pos = await GetUserLocation();
+        private void UpdateRideTypes(Geoposition pos)
+        {            
             if (pos == null)
             {
-
+                // Couldn't find location. Let user enter the address or move the map around
             }
             else
             {
@@ -78,6 +79,11 @@ namespace LyftUWP.Pages
             for (int i = 0; i < rridetype.ride_types.Count; i++)
             {
                 TypeOfRideCollection.Add(rridetype.ride_types[i]);
+            }
+            if (TypeOfRideCollection.Count > 0)
+            {
+                RideTypeListView.SelectedIndex = 1;
+                EtaInMinutes.Text = (rridetype.ride_types[1].eta_seconds / 60).ToString() + " MIN";
             }
         }
 
@@ -132,6 +138,33 @@ namespace LyftUWP.Pages
         private void PickupAddressTextBlock_Tapped(object sender, TappedRoutedEventArgs e)
         {
 
+        }
+
+        private void RideTypeListView_ItemClick(object sender, ItemClickEventArgs e)
+        {
+            SelectedRideGrid.Visibility = Visibility.Visible;
+            ShowRideTypesButtonGrid.Visibility = Visibility.Collapsed;
+            TypeOfRide ridetype = e.ClickedItem as TypeOfRide;
+            EtaInMinutes.Text = (ridetype.eta_seconds / 60).ToString() + " MIN";
+        }
+
+        private void RidesMap_LoadingStatusChanged(Windows.UI.Xaml.Controls.Maps.MapControl sender, object args)
+        {            
+            Windows.UI.Xaml.Controls.Maps.MapControl mpc = sender as Windows.UI.Xaml.Controls.Maps.MapControl;
+            if (sender.LoadingStatus == Windows.UI.Xaml.Controls.Maps.MapLoadingStatus.Loaded)
+            {
+                BasicGeoposition location = new BasicGeoposition { Latitude = mpc.ActualCamera.Location.Position.Latitude, Longitude = mpc.ActualCamera.Location.Position.Longitude, Altitude = mpc.ActualCamera.Location.Position.Altitude };
+                GeocodeLocationMarker(location);
+            }            //GeocodeLocationMarker(location);         
+        }
+
+        private async void GeocodeLocationMarker(BasicGeoposition location)
+        {
+            MapLocationFinderResult result = await MapLocationFinder.FindLocationsAtAsync(new Geopoint(location));
+            if (result.Status == MapLocationFinderStatus.Success)
+            {
+                PickupAddressTextBlock.Text = result.Locations[0].Address.FormattedAddress;
+            }
         }
     }
 }
