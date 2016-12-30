@@ -1,13 +1,16 @@
+var bodyParser = require('body-parser');
 
-
-var express = require('express'),
-  config = require('./config/config');
+var express = require('express');
+  //config = require('./config/config');
 
 var app = express();
 
-module.exports = require('./config/express')(app, config);
+//module.exports = require('./config/express')(app, config);
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({extended:true}));
+  console.log(req.body);
 
-app.listen(config.port, function () {
-  console.log('Express server listening on port ' + config.port);
+app.listen(3000, function () {
+  console.log('Express server listening on port 3000');
 });
 
