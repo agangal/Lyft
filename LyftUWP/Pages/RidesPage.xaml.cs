@@ -166,5 +166,15 @@ namespace LyftUWP.Pages
                 PickupAddressTextBlock.Text = result.Locations[0].Address.FormattedAddress;
             }
         }
+
+        private void CloseAddressSearchGridButton_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void AddressSearchListView_ItemClick(object sender, ItemClickEventArgs e)
+        {
+
+        }
     }
 }
