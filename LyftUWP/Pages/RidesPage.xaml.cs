@@ -149,10 +149,13 @@ namespace LyftUWP.Pages
         }
 
         private void RidesMap_LoadingStatusChanged(Windows.UI.Xaml.Controls.Maps.MapControl sender, object args)
-        {            
+        {
+            
             Windows.UI.Xaml.Controls.Maps.MapControl mpc = sender as Windows.UI.Xaml.Controls.Maps.MapControl;
             if (sender.LoadingStatus == Windows.UI.Xaml.Controls.Maps.MapLoadingStatus.Loaded)
             {
+               // PickupAddressTextBlock.Text = "Updating Address...";
+                CoordinatesTextBlock.Text = mpc.ActualCamera.Location.Position.Latitude.ToString() + ", " + mpc.ActualCamera.Location.Position.Longitude.ToString();
                 BasicGeoposition location = new BasicGeoposition { Latitude = mpc.ActualCamera.Location.Position.Latitude, Longitude = mpc.ActualCamera.Location.Position.Longitude, Altitude = mpc.ActualCamera.Location.Position.Altitude };
                 GeocodeLocationMarker(location);
             }            //GeocodeLocationMarker(location);         
@@ -163,6 +166,7 @@ namespace LyftUWP.Pages
             MapLocationFinderResult result = await MapLocationFinder.FindLocationsAtAsync(new Geopoint(location));
             if (result.Status == MapLocationFinderStatus.Success)
             {
+                var loc = result.Locations[0];
                 PickupAddressTextBlock.Text = result.Locations[0].Address.FormattedAddress;
             }
         }
