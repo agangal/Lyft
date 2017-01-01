@@ -42,6 +42,11 @@ namespace LyftUWP.Helpers
             set { ApplicationData.Current.LocalSettings.Values["ETA_URI_LASTUSED"] = value; }
         }
 
+        public static string RIDE_URI
+        {
+            get { return "https://api.lyft.com/v1/rides"; }
+        }
+
         public static async Task<string> GetRequest(string api)
         {
             HttpClient httpclient = new HttpClient();
