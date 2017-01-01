@@ -3,7 +3,8 @@
     "Microsoft.NETCore.UniversalWindowsPlatform": "5.1.0",
     "Microsoft.Toolkit.Uwp": "1.2.0",
     "Microsoft.Toolkit.Uwp.UI.Controls": "1.2.0",
-    "Newtonsoft.Json": "9.0.1"
+    "Newtonsoft.Json": "9.0.1",
+    "WindowsAzure.Messaging.Managed": "0.1.7.9"
   },
   "frameworks": {
     "uap10.0": {}
