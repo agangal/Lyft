@@ -49,7 +49,8 @@ namespace LyftUWP.Helpers
                 {
                     string resp = await httpresponseMessage.Content.ReadAsStringAsync();
                     var obj = JsonConvert.DeserializeObject<AccessTokenObject>(resp);
-                    Settings.ACCESS_TOKEN = obj.access_token;
+                    string conststr = "SANDBOX-";                  
+                    Settings.ACCESS_TOKEN = obj.access_token.Substring(conststr.Length, obj.access_token.Length - conststr.Length);
                 }
                 else
                 {
