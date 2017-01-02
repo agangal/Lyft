@@ -92,7 +92,73 @@
                       x:Name="RideTypeListView"></ListView>
             </Grid>
 
-            <Grid Grid.Row="1" Grid.ColumnSpan="2" MinHeight="55" Background="White" BorderBrush="#e6e6e6" BorderThickness="1" CornerRadius="6" Margin="6">
+            <Grid x:Name="SetDestinationGrid" Grid.Row="1" Grid.ColumnSpan="2" Background="Transparent"  BorderBrush="#e6e6e6" BorderThickness="1" CornerRadius="6" Margin="6">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"></RowDefinition>
+                    <RowDefinition Height="Auto"></RowDefinition>
+                    <RowDefinition Height="Auto"></RowDefinition>                   
+                </Grid.RowDefinitions>
+                <Grid Grid.Row="0" Background="#f7f7f7" BorderBrush="#D8DCE6" BorderThickness="0,0,0,1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"></ColumnDefinition>
+                        <ColumnDefinition Width="*"></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"></RowDefinition>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                    </Grid.RowDefinitions>
+                    <controls:ImageEx x:Name="SetDestinationGrid_ImageEx" Grid.Column="0" 
+                                      HorizontalAlignment="Right" Margin="5" Grid.RowSpan="2"
+                                      VerticalAlignment="Center"></controls:ImageEx>
+                    <TextBlock x:Name="SetDestinationGrid_RideType" Text="Lyft"
+                               Grid.Column="1" Grid.Row="0" FontFamily="Arial"
+                               FontSize="17" Margin="5,5,5,0" CharacterSpacing="50"></TextBlock>
+                    <TextBlock x:Name="SetDestinationGrid_RideTypeDescription" Text="Fast Ride, 4 seats"
+                               Foreground="#79869E"
+                               Grid.Column="1" Grid.Row="1" HorizontalAlignment="Left" VerticalAlignment="Center"
+                               Margin="5,2,5,5" FontSize="12"></TextBlock>
+                </Grid>
+                <Grid Grid.Row="1" Background="#f7f7f7">
+                    <Button x:Name="PriceEstimateButton" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                        BorderBrush="Transparent" Background="Transparent" Content="Price Estimate" FontSize="17"
+                        Margin="5"></Button>
+                </Grid>
+                <Grid Grid.Row="2" Background="White">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"></ColumnDefinition>
+                        <ColumnDefinition Width="*"></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+                    <Grid Grid.Column="0">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"></RowDefinition>
+                            <RowDefinition Height="*"></RowDefinition>
+                            <RowDefinition Height="*"></RowDefinition>
+                        </Grid.RowDefinitions>
+                        <Ellipse Grid.Row="0" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                 Fill="#352384" Height="15" Width="15" Margin="10,10,10,0"></Ellipse>
+                        <Rectangle Height="25" Width="1" Grid.Row="1" Fill="#D8DCE6" Margin="10,0,10,0"></Rectangle>
+                        <Ellipse Grid.Row="2" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                 Fill="#FF00BF" Height="15" Width="15" Margin="10,0,10,10"></Ellipse>
+                    </Grid>
+                    <Grid Grid.Column="1" >
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"></RowDefinition>
+                            <RowDefinition Height="*"></RowDefinition>
+                        </Grid.RowDefinitions>
+                        <Grid BorderBrush="#D8DCE6" BorderThickness="0,0,0,1">
+                            <TextBlock x:Name="SetDestinationGrid_AddPickup" Grid.Row="0" 
+                                   Text="2550 3rd Avenue" Margin="10" Tapped="SetDestinationGrid_AddPickup_Tapped"
+                                   HorizontalAlignment="Left" VerticalAlignment="Stretch"
+                                   FontSize="20"></TextBlock>
+                        </Grid>
+                        <TextBlock x:Name="SetDestinationGrid_AddDestination" Grid.Row="1" 
+                                   Text="Add Destination" Margin="10" Tapped="SetDestinationGrid_AddDestination_Tapped"
+                                   HorizontalAlignment="Left" VerticalAlignment="Stretch"
+                                   FontSize="20"></TextBlock>
+                    </Grid>
+                </Grid>
+            </Grid>
+            <Grid x:Name="SetPickupGrid" Grid.Row="1" Visibility="Collapsed" Grid.ColumnSpan="2" MinHeight="55" Background="White" BorderBrush="#e6e6e6" BorderThickness="1" CornerRadius="6" Margin="6">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"></ColumnDefinition>
                     <ColumnDefinition Width="*"></ColumnDefinition>

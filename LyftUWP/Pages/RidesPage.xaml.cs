@@ -185,5 +185,15 @@ namespace LyftUWP.Pages
         {
 
         }
+
+        private void SetDestinationGrid_AddPickup_Tapped(object sender, TappedRoutedEventArgs e)
+        {
+
+        }
+
+        private void SetDestinationGrid_AddDestination_Tapped(object sender, TappedRoutedEventArgs e)
+        {
+
+        }
     }
 }
