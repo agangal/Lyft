@@ -8,6 +8,8 @@ using Windows.Storage;
 namespace LyftUWP.Helpers
 {
     using Windows.Web.Http;
+    using Windows.Web.Http.Headers;
+
     public class URIHelper
     {
         public static string ACCESS_TOKEN_URI
@@ -64,6 +66,22 @@ namespace LyftUWP.Helpers
                 return null;
             }
             return null;
+        }
+
+        public static async Task<HttpResponseMessage> PostRequest(string api, string data)
+        {
+            HttpClient httpclient = new HttpClient();
+            try
+            {
+                httpclient.DefaultRequestHeaders.Authorization = new Windows.Web.Http.Headers.HttpCredentialsHeaderValue("Bearer", Settings.ACCESS_TOKEN);
+                httpclient.DefaultRequestHeaders.Accept.Add(new HttpMediaTypeWithQualityHeaderValue("application/json"));
+                HttpResponseMessage httpresponsemessage = await httpclient.PostAsync(new Uri(api), new HttpStringContent(data));
+                return httpresponsemessage;
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
         }
     }
 }
