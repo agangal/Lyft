@@ -103,6 +103,8 @@
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Model\AddressSearch.cs" />
+    <Compile Include="Model\Ride.cs" />
     <Compile Include="Model\RideType.cs" />
     <Compile Include="Pages\RidesPage.xaml.cs">
       <DependentUpon>RidesPage.xaml</DependentUpon>
