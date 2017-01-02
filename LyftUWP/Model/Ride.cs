@@ -22,6 +22,11 @@ namespace LyftUWP.Model
             return res;
         }
 
+        public static string SerializePrimeTimeConfirm(RideRequestPrimeTime rreqp)
+        {
+            string res = JsonConvert.SerializeObject(rreqp);
+            return res;
+        }
         public static RideResponse DeserializeRideResponse(string res)
         {
             RideResponse rres = JsonConvert.DeserializeObject<RideResponse>(res);
@@ -44,6 +49,13 @@ namespace LyftUWP.Model
     }
 
     public class RideRequest
+    {
+        public string ride_type { get; set; }
+        public Origin origin { get; set; }
+        public Destination destination { get; set; }
+    }
+
+    public class RideRequestPrimeTime
     {
         public string ride_id { get; set; }
         public string ride_type { get; set; }
