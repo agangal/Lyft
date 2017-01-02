@@ -146,9 +146,10 @@
             </Grid>
 
             <Grid Grid.Row="2" Background="#352384" CornerRadius="6" Margin="6" Grid.ColumnSpan="2" BorderBrush="#e6e6e6" BorderThickness="1">
-                <Button x:Name="SetPickupButton" Foreground="White" BorderBrush="Transparent" Background="Transparent"
-                    HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
-                    Content="Set Pickup" CharacterSpacing="50" FontSize="25"></Button>
+                <Button x:Name="SetPickupButton" Foreground="White" BorderBrush="Transparent"
+                        Background="Transparent" Click="SetPickupButton_Click"
+                        HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                        Content="Set Pickup" CharacterSpacing="50" FontSize="25"></Button>
             </Grid>
         </Grid>
 
