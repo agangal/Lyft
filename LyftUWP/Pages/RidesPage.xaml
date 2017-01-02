@@ -33,32 +33,18 @@
             </Grid>
         </DataTemplate>
 
-        <DataTemplate x:Key="AddressSearchDataTemplate" x:DataType="data:TypeOfRide">
+        <DataTemplate x:Key="AddressSearchDataTemplate" x:DataType="data:AddressSearch">
             <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"></ColumnDefinition>
-                    <ColumnDefinition Width="*"></ColumnDefinition>
-                    <ColumnDefinition Width="Auto"></ColumnDefinition>
-                </Grid.ColumnDefinitions>
-                <!--<controls:ImageEx 
-                    IsCacheEnabled="True"
-                    Source="{Binding image_url}"
-                    Stretch="UniformToFill" Height="35"
-                    PlaceholderSource="/Assets/Photos/ImageExPlaceholder.jpg"
-                    PlaceholderStretch="UniformToFill"
-                    HorizontalAlignment="Center"
-                    VerticalAlignment="Center"/>-->
-                <!--<StackPanel Orientation="Vertical" Grid.Column="1" HorizontalAlignment="Stretch">
-                    <TextBlock Text="{x:Bind display_name}" Foreground="Black" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="14" Margin="5,0,5,0"></TextBlock>
-                    <TextBlock Text="{x:Bind seats}" Foreground="Black" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="10" Margin="5,0,5,0"></TextBlock>
-                </StackPanel>-->
-                <TextBlock Foreground="Black" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Column="2" FontSize="14" Margin="5,0,0,0"></TextBlock>
+                <TextBlock Text="{x:Bind formatted_address}" Foreground="Black" 
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center"
+                           FontSize="14" Margin="5,0,0,0"></TextBlock>
             </Grid>
         </DataTemplate>
     </Page.Resources>
     
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-        <Grid x:Name="MapElementsGrid" Visibility="Visible">
+        <Grid x:Name="MapElementsGrid" Visibility="Collapsed">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*"></RowDefinition>
                 <RowDefinition Height="Auto"></RowDefinition>
@@ -219,10 +205,10 @@
             </Grid>
         </Grid>
 
-        <Grid x:Name="AddressSearchGrid" Visibility="Collapsed">
+        <Grid x:Name="AddressSearchGrid" Visibility="Visible">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"></RowDefinition>
-                <RowDefinition Height="Auto"></RowDefinition>
+                
                 <RowDefinition Height="*"></RowDefinition>
             </Grid.RowDefinitions>
             <Grid x:Name="SearchBar" BorderBrush="#e6e6e6" BorderThickness="1" CornerRadius="4">
@@ -235,17 +221,22 @@
                     <RowDefinition Height="Auto"></RowDefinition>
                     <RowDefinition Height="*"></RowDefinition>
                 </Grid.RowDefinitions>
-                <Button x:Name="CloseAddressSearchGridButton" MinHeight="30" Click="CloseAddressSearchGridButton_Click" Content="&#xE0A6;" FontFamily="Segoe MDL2 Assets" BorderBrush="Transparent" Background="Transparent" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"></Button>
-                <TextBox x:Name="SearchBarTextBox" PlaceholderText="Enter pickup location" Grid.Column="1" BorderBrush="Transparent" SelectionHighlightColor="Transparent" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"></TextBox>
+                <Button x:Name="CloseAddressSearchGridButton" MinHeight="30" 
+                        Click="CloseAddressSearchGridButton_Click" Content="&#xE106;"
+                        FontFamily="Segoe MDL2 Assets" BorderBrush="Transparent" 
+                        Background="Transparent" HorizontalAlignment="Stretch"
+                        VerticalAlignment="Stretch"></Button>
+                <TextBox x:Name="SearchBarTextBox"
+                         TextChanged="SearchBarTextBox_TextChanged"
+                         PlaceholderText="Enter pickup location"
+                         Grid.Column="1" BorderBrush="Transparent" SelectionHighlightColor="Transparent" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"></TextBox>
                 <!--<TextBlock Text="&#xE094;" Margin="10" FontFamily="Segoe MDL2 Assets" Grid.Column="2" HorizontalAlignment="Center" VerticalAlignment="Center"></TextBlock>-->
             </Grid>
-            <Grid Grid.Row="1">
-                <ListView ItemsSource="{x:Bind TypeOfRideCollection}"
-                      Grid.Column="0"
+            <Grid Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                <ListView ItemsSource="{x:Bind AddressOptions}"                     
                       ItemClick="AddressSearchListView_ItemClick"
                       IsItemClickEnabled="True"
-                      ItemTemplate="{StaticResource AddressSearchDataTemplate}"
-                      VerticalAlignment="Bottom" 
+                      ItemTemplate="{StaticResource AddressSearchDataTemplate}"                      
                       x:Name="AddressSearchListView"></ListView>
             </Grid>
         </Grid>        

@@ -31,10 +31,16 @@ namespace LyftUWP.Pages
     {
         private Geolocator _geolocator = null;
         public ObservableCollection<TypeOfRide> TypeOfRideCollection { get; set; }
+        public ObservableCollection<AddressSearch> AddressOptions { get; set; }
+        private double lat;
+        private double lon;
         public RidesPage()
         {
             this.InitializeComponent();
             TypeOfRideCollection = new ObservableCollection<TypeOfRide>();
+            AddressOptions = new ObservableCollection<AddressSearch>();
+            lat = 0;
+            lon = 0;
         }
 
         protected override async void OnNavigatedTo(NavigationEventArgs e)
@@ -95,12 +101,15 @@ namespace LyftUWP.Pages
 
         private async Task<Geoposition> GetUserLocation()
         {
+            
             var accessStatus = await Geolocator.RequestAccessAsync();
             if (accessStatus == GeolocationAccessStatus.Allowed)
             {
                 _geolocator = new Geolocator { ReportInterval = 5000, DesiredAccuracyInMeters = 200 };
                 _geolocator.PositionChanged += _geolocator_PositionChanged;
                 Geoposition pos = await _geolocator.GetGeopositionAsync();
+                lat = pos.Coordinate.Point.Position.Latitude;
+                lon = pos.Coordinate.Point.Position.Longitude;
                 return pos;
                 //_geolocator.StatusChanged += _geolocator_StatusChanged;               
             }
@@ -120,6 +129,8 @@ namespace LyftUWP.Pages
             if (position != null)
             {
                 System.Diagnostics.Debug.WriteLine(position.Coordinate.Point.Position.Latitude.ToString() + ", " + position.Coordinate.Point.Position.Longitude.ToString());
+                lat = position.Coordinate.Point.Position.Latitude;
+                lon = position.Coordinate.Point.Position.Longitude;
             }
         }
 
@@ -192,6 +203,41 @@ namespace LyftUWP.Pages
         }
 
         private void SetDestinationGrid_AddDestination_Tapped(object sender, TappedRoutedEventArgs e)
+        {
+
+        }
+
+        private async void SearchBarTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            TextBox tb = sender as TextBox;
+            if (tb.Text.Length > 3)
+            {
+                AddressOptions.Clear();
+                BasicGeoposition pos = new BasicGeoposition { Latitude = lat, Longitude = lon };
+                var results = await MapLocationFinder.FindLocationsAsync(tb.Text, new Geopoint(pos));
+                if (results.Status == MapLocationFinderStatus.Success)
+                {
+                    foreach (var location in results.Locations)
+                    {
+                        AddressSearch adsearch = new AddressSearch
+                        {
+                            formatted_address = location.Address.FormattedAddress,
+                            latitude = location.Point.Position.Latitude,
+                            longitude = location.Point.Position.Longitude
+                        };
+                        AddressOptions.Add(adsearch);
+                    }
+                   
+                }
+            }
+            else
+            {
+                AddressOptions.Clear();
+            }
+           
+        }
+
+        private void UpdateAddressOptions(string text)
         {
 
         }
