@@ -23,6 +23,7 @@ namespace LyftUWP.Pages
     using Model;
     using System.Collections.ObjectModel;
     using Windows.Services.Maps;
+    using Windows.System.Threading;
     using Windows.UI.Xaml.Controls.Maps;
 
     /// <summary>
@@ -35,6 +36,8 @@ namespace LyftUWP.Pages
         public ObservableCollection<AddressSearch> AddressOptions { get; set; }
         private double lat;
         private double lon;
+        private DispatcherTimer timer;
+       
         public RidesPage()
         {
             this.InitializeComponent();
@@ -42,6 +45,13 @@ namespace LyftUWP.Pages
             AddressOptions = new ObservableCollection<AddressSearch>();
             lat = 0;
             lon = 0;
+            timer = new DispatcherTimer();
+        }
+
+        protected override void OnNavigatingFrom(NavigatingCancelEventArgs e)
+        {
+            base.OnNavigatingFrom(e);
+            timer.Stop();
         }
 
         protected override async void OnNavigatedTo(NavigationEventArgs e)
@@ -50,7 +60,20 @@ namespace LyftUWP.Pages
             RidesMap.LoadingStatusChanged += RidesMap_LoadingStatusChanged;
             
             Geoposition pos = await GetUserLocation();
+            timer = new DispatcherTimer();
+            timer.Tick += Timer_Tick;
+            timer.Interval = new TimeSpan(0, 0, 5);
+            timer.Start();
             UpdateRideTypes(pos);
+        }
+
+        private void Timer_Tick(object sender, object e)
+        {
+            if (RidesMap.Visibility == Visibility.Visible)
+            {
+                Geopoint center = RidesMap.Center;
+                GeocodeLocationMarker(center);
+            }
         }
 
         private void UpdateRideTypes(Geoposition pos)
@@ -173,22 +196,24 @@ namespace LyftUWP.Pages
                 // PickupAddressTextBlock.Text = "Updating Address...";
                 CoordinatesTextBlock.Text = mpc.ActualCamera.Location.Position.Latitude.ToString() + ", " + mpc.ActualCamera.Location.Position.Longitude.ToString();// RidesMap.Center.Position.Latitude.ToString() + ", " + RidesMap.Center.Position.Longitude.ToString();//mpc.ActualCamera.Location.Position.Latitude.ToString() + ", " + mpc.ActualCamera.Location.Position.Longitude.ToString();
                 BasicGeoposition location = new BasicGeoposition { Latitude = mpc.ActualCamera.Location.Position.Latitude, Longitude = mpc.ActualCamera.Location.Position.Longitude, Altitude = mpc.ActualCamera.Location.Position.Altitude };
-                GeocodeLocationMarker(location);
+                //GeocodeLocationMarker(location);
             }            //GeocodeLocationMarker(location);         
         }
 
-        private async void GeocodeLocationMarker(BasicGeoposition location)
+        
+
+        private async void GeocodeLocationMarker(Geopoint location)
         {
-            MapLocationFinderResult result = await MapLocationFinder.FindLocationsAtAsync(new Geopoint(location));
+            MapLocationFinderResult result = await MapLocationFinder.FindLocationsAtAsync(location);
             if (result.Status == MapLocationFinderStatus.Success)
             {
                 var loc = result.Locations[0];
                 PickupAddressTextBlock.Text = result.Locations[0].Address.FormattedAddress;
                 //RidesMap.MapElements.Clear();
-               // Geopoint myPoint = new Geopoint(new BasicGeoposition() { Latitude = 51, Longitude = 0 });
-                //create POI
-                //MapIcon myPOI = new MapIcon { Location = new Geopoint(location), Title = "My position", ZIndex = 0 };
-                //// add to map and center it
+                //Geopoint myPoint = new Geopoint(new BasicGeoposition() { Latitude = 51, Longitude = 0 });
+                ////create POI
+                //MapIcon myPOI = new MapIcon { Location = location, Title = "My position", ZIndex = 0 };
+                ////// add to map and center it
                 //RidesMap.MapElements.Add(myPOI);               
             }
         }
@@ -308,6 +333,8 @@ namespace LyftUWP.Pages
             SetDestinationGrid.Visibility = Visibility.Visible;
             SetDestinationButton.Visibility = Visibility.Visible;
         }
+
+
        
     }
 }
