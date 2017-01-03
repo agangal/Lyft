@@ -226,6 +226,7 @@ namespace LyftUWP.Pages
 
         private void SetPickupButton_Click(object sender, RoutedEventArgs e)
         {
+            timer.Stop();
             HideSetPickupView();
             ShowSetDestinationView();
         }
