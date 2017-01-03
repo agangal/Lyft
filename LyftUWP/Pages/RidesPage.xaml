@@ -42,9 +42,9 @@
             </Grid>
         </DataTemplate>
     </Page.Resources>
-    
+
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-        <Grid x:Name="MapElementsGrid" Visibility="Collapsed">
+        <Grid x:Name="MapElementsGrid" Visibility="Visible">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*"></RowDefinition>
                 <RowDefinition Height="Auto"></RowDefinition>
@@ -54,16 +54,21 @@
                 <ColumnDefinition Width="Auto"></ColumnDefinition>
                 <ColumnDefinition Width="*"></ColumnDefinition>
             </Grid.ColumnDefinitions>
-            <Maps:MapControl x:Name="RidesMap" LoadingStatusChanged="RidesMap_LoadingStatusChanged" Grid.RowSpan="3" Grid.ColumnSpan="2" MapServiceToken="DAPntNl3nFQ77ZnQJ11j~UBZWS5WadayHUSUaVI_iMA~AhwF-6z9Ei6wQHxYd_eXHX4ma_b2FuZvrxgxTQs6gD-1aTmmfOp1T-Z-vghT2RMu"/>
-            <Grid x:Name="LocationMarkerGrid" Grid.ColumnSpan="2" HorizontalAlignment="Center" VerticalAlignment="Center">
-                <Grid>
-                    <Ellipse x:Name="LocationMarkerEllipseOuter" Height="38" Width="38" HorizontalAlignment="Center" VerticalAlignment="Center" Fill="White"></Ellipse>
-                    <Ellipse x:Name="LocationMarkerEllipseInner" Height="35" Width="35" HorizontalAlignment="Center" VerticalAlignment="Center" Fill="#352384"></Ellipse>
-                    <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="2">
-                        <TextBlock Text="3" x:Name="EtaInMinutesLocationMarker" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="White" FontSize="10"></TextBlock>
-                        <TextBlock Text="min" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="10"></TextBlock>
-                    </StackPanel>
-                </Grid>
+            <Maps:MapControl x:Name="RidesMap"  Grid.RowSpan="3" Grid.ColumnSpan="2" MapServiceToken="DAPntNl3nFQ77ZnQJ11j~UBZWS5WadayHUSUaVI_iMA~AhwF-6z9Ei6wQHxYd_eXHX4ma_b2FuZvrxgxTQs6gD-1aTmmfOp1T-Z-vghT2RMu"/>
+            <Grid x:Name="LocationMarkerGrid" Grid.RowSpan="3" Grid.ColumnSpan="2" HorizontalAlignment="Center" VerticalAlignment="Center">
+                
+                <StackPanel Orientation="Vertical" Grid.Row="0" VerticalAlignment="Bottom">
+                    <Grid Padding="0">
+                        <Ellipse x:Name="LocationMarkerEllipseOuter" Height="38" Width="38" HorizontalAlignment="Center" VerticalAlignment="Center" Fill="White"></Ellipse>
+                        <Ellipse x:Name="LocationMarkerEllipseInner" Height="35" Width="35" HorizontalAlignment="Center" VerticalAlignment="Center" Fill="#352384"></Ellipse>
+                        <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="2">
+                            <TextBlock Text="3" x:Name="EtaInMinutesLocationMarker" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="White" FontSize="10"></TextBlock>
+                            <TextBlock Text="min" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="10"></TextBlock>
+                        </StackPanel>
+                    </Grid>
+                    <Image  Source="/Images/MapMarker.png" Height="30"></Image>
+                </StackPanel>
+
             </Grid>
             <Grid Grid.Column="0" Grid.Row="0" Background="White"
               Visibility="Visible" x:Name="RideTypeListViewGrid" Margin="6,10,10,2"
@@ -78,11 +83,13 @@
                       x:Name="RideTypeListView"></ListView>
             </Grid>
 
-            <Grid x:Name="SetDestinationGrid" Grid.Row="1" Grid.ColumnSpan="2" Background="Transparent"  BorderBrush="#e6e6e6" BorderThickness="1" CornerRadius="6" Margin="6">
+            <Grid x:Name="SetDestinationGrid" Grid.Row="1" Grid.ColumnSpan="2" Visibility="Collapsed"
+                  Background="Transparent"  BorderBrush="#e6e6e6" BorderThickness="1"
+                  CornerRadius="6" Margin="6">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"></RowDefinition>
                     <RowDefinition Height="Auto"></RowDefinition>
-                    <RowDefinition Height="Auto"></RowDefinition>                   
+                    <RowDefinition Height="Auto"></RowDefinition>
                 </Grid.RowDefinitions>
                 <Grid Grid.Row="0" Background="#f7f7f7" BorderBrush="#D8DCE6" BorderThickness="0,0,0,1">
                     <Grid.ColumnDefinitions>
@@ -144,15 +151,13 @@
                     </Grid>
                 </Grid>
             </Grid>
-            <Grid x:Name="SetPickupGrid" Grid.Row="1" Visibility="Collapsed" Grid.ColumnSpan="2" MinHeight="55" Background="White" BorderBrush="#e6e6e6" BorderThickness="1" CornerRadius="6" Margin="6">
+            <Grid x:Name="SetPickupGrid" Grid.Row="1" Visibility="Visible" Grid.ColumnSpan="2" MinHeight="55" Background="White" BorderBrush="#e6e6e6" BorderThickness="1" CornerRadius="6" Margin="6">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"></ColumnDefinition>
                     <ColumnDefinition Width="*"></ColumnDefinition>
                     <ColumnDefinition Width="Auto"></ColumnDefinition>
                 </Grid.ColumnDefinitions>
-                <Grid x:Name="ProgressRingGrid" Visibility="Collapsed">
-                    <ProgressRing x:Name="BusyIndicator" IsEnabled="False" Height="45" Width="45" Foreground="Pink"></ProgressRing>
-                </Grid>
+
                 <Grid x:Name="ShowRideTypesButtonGrid" Visibility="Visible" Margin="10">
                     <Ellipse Height="40" Width="40" HorizontalAlignment="Center" 
                              VerticalAlignment="Center" Fill="#474C62"></Ellipse>
@@ -202,13 +207,18 @@
                         Background="Transparent" Click="SetPickupButton_Click"
                         HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
                         Content="Set Pickup" CharacterSpacing="50" FontSize="25"></Button>
+
+                <Button x:Name="SetDestinationButton" Foreground="White" BorderBrush="Transparent"
+                        Background="Transparent" Click="SetDestinationButton_Click" Visibility="Collapsed"
+                        HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                        Content="Set Pickup" CharacterSpacing="50" FontSize="25"></Button>
             </Grid>
         </Grid>
 
-        <Grid x:Name="AddressSearchGrid" Visibility="Visible">
+        <Grid x:Name="AddressSearchGrid" Visibility="Collapsed">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"></RowDefinition>
-                
+
                 <RowDefinition Height="*"></RowDefinition>
             </Grid.RowDefinitions>
             <Grid x:Name="SearchBar" BorderBrush="#e6e6e6" BorderThickness="1" CornerRadius="4">
@@ -239,7 +249,7 @@
                       ItemTemplate="{StaticResource AddressSearchDataTemplate}"                      
                       x:Name="AddressSearchListView"></ListView>
             </Grid>
-        </Grid>        
-        
+        </Grid>
+
     </Grid>
 </Page>

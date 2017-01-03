@@ -23,6 +23,7 @@ namespace LyftUWP.Pages
     using Model;
     using System.Collections.ObjectModel;
     using Windows.Services.Maps;
+    using Windows.UI.Xaml.Controls.Maps;
 
     /// <summary>
     /// An empty page that can be used on its own or navigated to within a Frame.
@@ -46,6 +47,8 @@ namespace LyftUWP.Pages
         protected override async void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
+            RidesMap.LoadingStatusChanged += RidesMap_LoadingStatusChanged;
+            
             Geoposition pos = await GetUserLocation();
             UpdateRideTypes(pos);
         }
@@ -97,6 +100,7 @@ namespace LyftUWP.Pages
         {
             base.OnNavigatedFrom(e);
             _geolocator.PositionChanged -= _geolocator_PositionChanged;
+            RidesMap.LoadingStatusChanged -= RidesMap_LoadingStatusChanged;
         }
 
         private async Task<Geoposition> GetUserLocation()
@@ -148,7 +152,8 @@ namespace LyftUWP.Pages
 
         private void PickupAddressTextBlock_Tapped(object sender, TappedRoutedEventArgs e)
         {
-
+            HideSetPickupView();
+            ShowAddressSearchView();
         }
 
         private void RideTypeListView_ItemClick(object sender, ItemClickEventArgs e)
@@ -165,8 +170,8 @@ namespace LyftUWP.Pages
             Windows.UI.Xaml.Controls.Maps.MapControl mpc = sender as Windows.UI.Xaml.Controls.Maps.MapControl;
             if (sender.LoadingStatus == Windows.UI.Xaml.Controls.Maps.MapLoadingStatus.Loaded)
             {
-               // PickupAddressTextBlock.Text = "Updating Address...";
-                CoordinatesTextBlock.Text = mpc.ActualCamera.Location.Position.Latitude.ToString() + ", " + mpc.ActualCamera.Location.Position.Longitude.ToString();
+                // PickupAddressTextBlock.Text = "Updating Address...";
+                CoordinatesTextBlock.Text = mpc.ActualCamera.Location.Position.Latitude.ToString() + ", " + mpc.ActualCamera.Location.Position.Longitude.ToString();// RidesMap.Center.Position.Latitude.ToString() + ", " + RidesMap.Center.Position.Longitude.ToString();//mpc.ActualCamera.Location.Position.Latitude.ToString() + ", " + mpc.ActualCamera.Location.Position.Longitude.ToString();
                 BasicGeoposition location = new BasicGeoposition { Latitude = mpc.ActualCamera.Location.Position.Latitude, Longitude = mpc.ActualCamera.Location.Position.Longitude, Altitude = mpc.ActualCamera.Location.Position.Altitude };
                 GeocodeLocationMarker(location);
             }            //GeocodeLocationMarker(location);         
@@ -179,27 +184,31 @@ namespace LyftUWP.Pages
             {
                 var loc = result.Locations[0];
                 PickupAddressTextBlock.Text = result.Locations[0].Address.FormattedAddress;
+                //RidesMap.MapElements.Clear();
+               // Geopoint myPoint = new Geopoint(new BasicGeoposition() { Latitude = 51, Longitude = 0 });
+                //create POI
+                //MapIcon myPOI = new MapIcon { Location = new Geopoint(location), Title = "My position", ZIndex = 0 };
+                //// add to map and center it
+                //RidesMap.MapElements.Add(myPOI);               
             }
         }
 
         private void CloseAddressSearchGridButton_Click(object sender, RoutedEventArgs e)
         {
-
-        }
-
-        private void AddressSearchListView_ItemClick(object sender, ItemClickEventArgs e)
-        {
-
-        }
+            HideAddressSearchView();
+            ShowSetPickupView();
+        }        
 
         private void SetPickupButton_Click(object sender, RoutedEventArgs e)
         {
-
+            HideSetPickupView();
+            ShowSetDestinationView();
         }
 
         private void SetDestinationGrid_AddPickup_Tapped(object sender, TappedRoutedEventArgs e)
         {
-
+            HideSetDestinationView();
+            ShowSetPickupView();
         }
 
         private void SetDestinationGrid_AddDestination_Tapped(object sender, TappedRoutedEventArgs e)
@@ -237,9 +246,68 @@ namespace LyftUWP.Pages
            
         }
 
-        private void UpdateAddressOptions(string text)
+        private void AddressSearchListView_ItemClick(object sender, ItemClickEventArgs e)
+        {
+            RidesMap.LoadingStatusChanged -= RidesMap_LoadingStatusChanged;
+            AddressSearch address = (AddressSearch)e.ClickedItem;
+            BasicGeoposition pos = new BasicGeoposition { Latitude = address.latitude, Longitude = address.longitude };
+            RidesMap.Center = new Geopoint(pos);
+            HideAddressSearchView();
+            ShowSetPickupView();
+            SetMapZoomLevel(18);
+           
+        }
+
+        private void SetDestinationButton_Click(object sender, RoutedEventArgs e)
         {
 
         }
+
+        private void SetMapZoomLevel(int level)
+        {
+            RidesMap.ZoomLevel = level;
+            //RidesMap.LoadingStatusChanged += RidesMap_LoadingStatusChanged;
+        }
+
+        private void HideAddressSearchView()
+        {
+            AddressSearchGrid.Visibility = Visibility.Collapsed;
+            RidesMap.LoadingStatusChanged -= RidesMap_LoadingStatusChanged;
+            MapElementsGrid.Visibility = Visibility.Visible;
+        }
+
+        private void ShowAddressSearchView()
+        {
+            RidesMap.LoadingStatusChanged -= RidesMap_LoadingStatusChanged;
+            MapElementsGrid.Visibility = Visibility.Collapsed;
+            AddressSearchGrid.Visibility = Visibility.Visible;
+        }
+
+        private void HideSetPickupView()
+        {
+            RideTypeListViewGrid.Visibility = Visibility.Collapsed;
+            SetPickupGrid.Visibility = Visibility.Collapsed;
+            SetPickupButton.Visibility = Visibility.Collapsed;
+        }
+
+        private void ShowSetPickupView()
+        {
+            RideTypeListViewGrid.Visibility = Visibility.Visible;
+            SetPickupGrid.Visibility = Visibility.Visible;
+            SetPickupButton.Visibility = Visibility.Visible;
+        }
+
+        private void HideSetDestinationView()
+        {
+            SetDestinationGrid.Visibility = Visibility.Collapsed;
+            SetDestinationButton.Visibility = Visibility.Collapsed;
+        }
+
+        private void ShowSetDestinationView()
+        {
+            SetDestinationGrid.Visibility = Visibility.Visible;
+            SetDestinationButton.Visibility = Visibility.Visible;
+        }
+       
     }
 }
