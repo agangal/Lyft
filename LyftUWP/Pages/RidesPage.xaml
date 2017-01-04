@@ -54,9 +54,11 @@
                 <ColumnDefinition Width="Auto"></ColumnDefinition>
                 <ColumnDefinition Width="*"></ColumnDefinition>
             </Grid.ColumnDefinitions>
-            <Maps:MapControl x:Name="RidesMap"  Grid.RowSpan="3" Grid.ColumnSpan="2" MapServiceToken="DAPntNl3nFQ77ZnQJ11j~UBZWS5WadayHUSUaVI_iMA~AhwF-6z9Ei6wQHxYd_eXHX4ma_b2FuZvrxgxTQs6gD-1aTmmfOp1T-Z-vghT2RMu"/>
-            <Grid x:Name="LocationMarkerGrid" Grid.RowSpan="3" Grid.ColumnSpan="2" HorizontalAlignment="Center" VerticalAlignment="Center">
-                
+            <Maps:MapControl x:Name="RidesMap"  Grid.RowSpan="3" Grid.ColumnSpan="2"
+                             HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                             MapServiceToken="DAPntNl3nFQ77ZnQJ11j~UBZWS5WadayHUSUaVI_iMA~AhwF-6z9Ei6wQHxYd_eXHX4ma_b2FuZvrxgxTQs6gD-1aTmmfOp1T-Z-vghT2RMu"/>
+            <Grid x:Name="LocationMarkerGrid" Grid.RowSpan="3" Grid.ColumnSpan="2" 
+                  HorizontalAlignment="Center" VerticalAlignment="Center">                
                 <StackPanel Orientation="Vertical" Grid.Row="0" VerticalAlignment="Bottom">
                     <Grid Padding="0">
                         <Ellipse x:Name="LocationMarkerEllipseOuter" Height="38" Width="38" HorizontalAlignment="Center" VerticalAlignment="Center" Fill="White"></Ellipse>
@@ -68,12 +70,11 @@
                     </Grid>
                     <Image  Source="/Images/MapMarker.png" Height="30"></Image>
                 </StackPanel>
-
             </Grid>
             <Grid Grid.Column="0" Grid.Row="0" Background="White"
-              Visibility="Visible" x:Name="RideTypeListViewGrid" Margin="6,10,10,2"
-              HorizontalAlignment="Left" VerticalAlignment="Bottom"
-              BorderBrush="#e6e6e6" BorderThickness="1" CornerRadius="6">
+                  Visibility="Visible" x:Name="RideTypeListViewGrid" Margin="6,10,10,2"
+                  HorizontalAlignment="Left" VerticalAlignment="Bottom"
+                  BorderBrush="#e6e6e6" BorderThickness="1" CornerRadius="6">
                 <ListView ItemsSource="{x:Bind TypeOfRideCollection}"
                       Grid.Column="0"
                       ItemClick="RideTypeListView_ItemClick"
@@ -215,7 +216,7 @@
             </Grid>
         </Grid>
 
-        <Grid x:Name="AddressSearchGrid" Visibility="Collapsed">
+        <Grid x:Name="PickUpAddressSearchGrid" Visibility="Collapsed">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"></RowDefinition>
 
@@ -248,6 +249,42 @@
                       IsItemClickEnabled="True"
                       ItemTemplate="{StaticResource AddressSearchDataTemplate}"                      
                       x:Name="AddressSearchListView"></ListView>
+            </Grid>
+        </Grid>
+
+        <Grid x:Name="DestinationAddressSearchGrid" Visibility="Collapsed">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"></RowDefinition>
+
+                <RowDefinition Height="*"></RowDefinition>
+            </Grid.RowDefinitions>
+            <Grid x:Name="DestinationSearchBar" BorderBrush="#e6e6e6" BorderThickness="1" CornerRadius="4">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"></ColumnDefinition>
+                    <ColumnDefinition Width="*"></ColumnDefinition>
+                    <ColumnDefinition Width="Auto"></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"></RowDefinition>
+                    <RowDefinition Height="*"></RowDefinition>
+                </Grid.RowDefinitions>
+                <Button x:Name="CloseDestinationAddressSearchGridButton" MinHeight="30" 
+                        Click="CloseAddressSearchGridButton_Click" Content="&#xE106;"
+                        FontFamily="Segoe MDL2 Assets" BorderBrush="Transparent" 
+                        Background="Transparent" HorizontalAlignment="Stretch"
+                        VerticalAlignment="Stretch"></Button>
+                <TextBox x:Name="DestinationSearchBarTextBox"
+                         TextChanged="DestinationSearchBarTextBox_TextChanged"
+                         PlaceholderText="Enter pickup location"
+                         Grid.Column="1" BorderBrush="Transparent" SelectionHighlightColor="Transparent" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"></TextBox>
+                <!--<TextBlock Text="&#xE094;" Margin="10" FontFamily="Segoe MDL2 Assets" Grid.Column="2" HorizontalAlignment="Center" VerticalAlignment="Center"></TextBlock>-->
+            </Grid>
+            <Grid Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                <ListView ItemsSource="{x:Bind AddressOptions}"                     
+                      ItemClick="DestinationAddressSearchListView_ItemClick"
+                      IsItemClickEnabled="True"
+                      ItemTemplate="{StaticResource AddressSearchDataTemplate}"                      
+                      x:Name="DestinationAddressSearchListView"></ListView>
             </Grid>
         </Grid>
 

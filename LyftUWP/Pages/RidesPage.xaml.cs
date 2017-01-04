@@ -56,9 +56,8 @@ namespace LyftUWP.Pages
 
         protected override async void OnNavigatedTo(NavigationEventArgs e)
         {
-            base.OnNavigatedTo(e);
-            RidesMap.LoadingStatusChanged += RidesMap_LoadingStatusChanged;
-            
+            base.OnNavigatedTo(e);            
+            RidesMap.CenterChanged += RidesMap_CenterChanged;
             Geoposition pos = await GetUserLocation();
             timer = new DispatcherTimer();
             timer.Tick += Timer_Tick;
@@ -123,7 +122,6 @@ namespace LyftUWP.Pages
         {
             base.OnNavigatedFrom(e);
             _geolocator.PositionChanged -= _geolocator_PositionChanged;
-            RidesMap.LoadingStatusChanged -= RidesMap_LoadingStatusChanged;
         }
 
         private async Task<Geoposition> GetUserLocation()
@@ -186,21 +184,6 @@ namespace LyftUWP.Pages
             TypeOfRide ridetype = e.ClickedItem as TypeOfRide;
             EtaInMinutes.Text = (ridetype.eta_seconds / 60).ToString() + " MIN";
         }
-
-        private void RidesMap_LoadingStatusChanged(Windows.UI.Xaml.Controls.Maps.MapControl sender, object args)
-        {
-            
-            Windows.UI.Xaml.Controls.Maps.MapControl mpc = sender as Windows.UI.Xaml.Controls.Maps.MapControl;
-            if (sender.LoadingStatus == Windows.UI.Xaml.Controls.Maps.MapLoadingStatus.Loaded)
-            {
-                // PickupAddressTextBlock.Text = "Updating Address...";
-                CoordinatesTextBlock.Text = mpc.ActualCamera.Location.Position.Latitude.ToString() + ", " + mpc.ActualCamera.Location.Position.Longitude.ToString();// RidesMap.Center.Position.Latitude.ToString() + ", " + RidesMap.Center.Position.Longitude.ToString();//mpc.ActualCamera.Location.Position.Latitude.ToString() + ", " + mpc.ActualCamera.Location.Position.Longitude.ToString();
-                BasicGeoposition location = new BasicGeoposition { Latitude = mpc.ActualCamera.Location.Position.Latitude, Longitude = mpc.ActualCamera.Location.Position.Longitude, Altitude = mpc.ActualCamera.Location.Position.Altitude };
-                //GeocodeLocationMarker(location);
-            }            //GeocodeLocationMarker(location);         
-        }
-
-        
 
         private async void GeocodeLocationMarker(Geopoint location)
         {
@@ -272,16 +255,19 @@ namespace LyftUWP.Pages
            
         }
 
-        private void AddressSearchListView_ItemClick(object sender, ItemClickEventArgs e)
+        private async void AddressSearchListView_ItemClick(object sender, ItemClickEventArgs e)
         {
-            RidesMap.LoadingStatusChanged -= RidesMap_LoadingStatusChanged;
+            
             AddressSearch address = (AddressSearch)e.ClickedItem;
             BasicGeoposition pos = new BasicGeoposition { Latitude = address.latitude, Longitude = address.longitude };
             RidesMap.Center = new Geopoint(pos);
+            RidesMap.CenterChanged -= RidesMap_CenterChanged;
+            SetMapZoomLevel(19);
             HideAddressSearchView();
             ShowSetPickupView();
-            SetMapZoomLevel(18);
-           
+            await Task.Delay(1000);
+            RidesMap.CenterChanged += RidesMap_CenterChanged;
+
         }
 
         private void SetDestinationButton_Click(object sender, RoutedEventArgs e)
@@ -297,16 +283,14 @@ namespace LyftUWP.Pages
 
         private void HideAddressSearchView()
         {
-            AddressSearchGrid.Visibility = Visibility.Collapsed;
-            RidesMap.LoadingStatusChanged -= RidesMap_LoadingStatusChanged;
+            PickUpAddressSearchGrid.Visibility = Visibility.Collapsed;           
             MapElementsGrid.Visibility = Visibility.Visible;
         }
 
         private void ShowAddressSearchView()
-        {
-            RidesMap.LoadingStatusChanged -= RidesMap_LoadingStatusChanged;
+        {            
             MapElementsGrid.Visibility = Visibility.Collapsed;
-            AddressSearchGrid.Visibility = Visibility.Visible;
+            PickUpAddressSearchGrid.Visibility = Visibility.Visible;
         }
 
         private void HideSetPickupView()
@@ -335,7 +319,43 @@ namespace LyftUWP.Pages
             SetDestinationButton.Visibility = Visibility.Visible;
         }
 
+        private void RidesMap_CenterChanged(MapControl sender, object args)
+        {
+            System.Diagnostics.Debug.WriteLine("Center Changed");
+        }
 
-       
+        private async void DestinationSearchBarTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            TextBox tb = sender as TextBox;
+            if (tb.Text.Length > 3)
+            {
+                AddressOptions.Clear();
+                BasicGeoposition pos = new BasicGeoposition { Latitude = lat, Longitude = lon };
+                var results = await MapLocationFinder.FindLocationsAsync(tb.Text, new Geopoint(pos));
+                if (results.Status == MapLocationFinderStatus.Success)
+                {
+                    foreach (var location in results.Locations)
+                    {
+                        AddressSearch adsearch = new AddressSearch
+                        {
+                            formatted_address = location.Address.FormattedAddress,
+                            latitude = location.Point.Position.Latitude,
+                            longitude = location.Point.Position.Longitude
+                        };
+                        AddressOptions.Add(adsearch);
+                    }
+
+                }
+            }
+            else
+            {
+                AddressOptions.Clear();
+            }
+        }
+
+        private void DestinationAddressSearchListView_ItemClick(object sender, ItemClickEventArgs e)
+        {
+
+        }
     }
 }
