@@ -49,17 +49,14 @@ namespace LyftUWP.Helpers
             get { return "https://api.lyft.com/v1/rides"; }
         }
 
-        public static async Task<string> GetRequest(string api)
+        public static async Task<HttpResponseMessage> GetRequest(string api)
         {
             HttpClient httpclient = new HttpClient();
             try
             {
                 httpclient.DefaultRequestHeaders.Authorization = new Windows.Web.Http.Headers.HttpCredentialsHeaderValue("Bearer", Settings.ACCESS_TOKEN);
-                var httpresponsemessage = await httpclient.GetAsync(new Uri(api));
-                if (httpresponsemessage.IsSuccessStatusCode)
-                {
-                    return (await httpresponsemessage.Content.ReadAsStringAsync());
-                }
+                HttpResponseMessage httpresponsemessage = await httpclient.GetAsync(new Uri(api));
+                return httpresponsemessage;
             }
             catch (Exception ex)
             {
