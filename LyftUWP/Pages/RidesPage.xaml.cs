@@ -17,14 +17,22 @@ using Windows.UI.Xaml.Navigation;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234238
 
+    /*
+     * 
+     * 1. Move it around and hit Set pickup --> timer.Stop(); --> Set destination --> Click add pickup --> timer.Start()
+     * 2. Search for an address --> Select address --> timer.Stop(), Wait a second --> timer.Start() -->Hit set pickup --> timer.stop
+     *  
+     */
 namespace LyftUWP.Pages
 {
     using LyftUWP.Helpers;
     using Model;
     using System.Collections.ObjectModel;
     using Windows.Services.Maps;
+    using Windows.Storage.Streams;
     using Windows.System.Threading;
     using Windows.UI.Xaml.Controls.Maps;
+    using Windows.Web.Http;
 
     /// <summary>
     /// An empty page that can be used on its own or navigated to within a Frame.
@@ -59,11 +67,15 @@ namespace LyftUWP.Pages
             base.OnNavigatedTo(e);            
             RidesMap.CenterChanged += RidesMap_CenterChanged;
             Geoposition pos = await GetUserLocation();
+            
             timer = new DispatcherTimer();
             timer.Tick += Timer_Tick;
             timer.Interval = new TimeSpan(0, 0, 5);
             timer.Start();
-            UpdateRideTypes(pos);
+            BasicGeoposition bpos = new BasicGeoposition { Latitude = pos.Coordinate.Point.Position.Latitude, Longitude = pos.Coordinate.Point.Position.Longitude, Altitude = pos.Coordinate.Point.Position.Altitude };
+            RidesMap.Center = new Geopoint(bpos);
+            SetMapZoomLevel(19);
+           // UpdateRideTypes(bpos);
         }
 
         private void Timer_Tick(object sender, object e)
@@ -75,46 +87,68 @@ namespace LyftUWP.Pages
             }
         }
 
-        private void UpdateRideTypes(Geoposition pos)
-        {            
-            if (pos == null)
+        private void UpdateRideTypes(BasicGeoposition pos)
+        {
+            DownloadAvailableRideTypes(pos);           
+        }
+
+        public async void DownloadAvailableRideTypes(BasicGeoposition pos)
+        {
+            HttpResponseMessage ride_type_response = await URIHelper.GetRequest(URIHelper.RIDE_TYPE_URI + "?lat=" + pos.Latitude.ToString() + "&lng=" + pos.Longitude.ToString());
+            if (ride_type_response.IsSuccessStatusCode)
             {
-                // Couldn't find location. Let user enter the address or move the map around
+                HttpResponseMessage eta_response = await URIHelper.GetRequest(URIHelper.ETA_URI + "?lat=" + pos.Latitude.ToString() + "&lng=" + pos.Longitude.ToString());
+                if (eta_response.IsSuccessStatusCode)
+                {
+                    string ride_type = await ride_type_response.Content.ReadAsStringAsync();
+                    string eta = await eta_response.Content.ReadAsStringAsync();
+                    //string ride_type = await URIHelper.GetRequest(URIHelper.RIDE_TYPE_URI + "?lat=47.61" + "&lng=-122.33");
+                    //string eta = await URIHelper.GetRequest(URIHelper.ETA_URI + "?lat=47.61" + "&lng=-122.33");
+                    RootObjectRideType rridetype = RideType.DataDeserializerRideType(ride_type);
+                    RootObjectEtaEstimate retaestimate = RideType.DataDeserializerEtaEstimate(eta);
+                    for (int i = 0; i < rridetype.ride_types.Count; i++)
+                    {
+                        for (int j = 0; j < retaestimate.eta_estimates.Count; j++)
+                        {
+                            if (retaestimate.eta_estimates[j].ride_type == rridetype.ride_types[i].ride_type)
+                            {
+                                rridetype.ride_types[i].eta_seconds = retaestimate.eta_estimates[j].eta_seconds;
+                                break;
+                            }
+                        }
+                    }
+                    TypeOfRideCollection.Clear();
+                    for (int i = 0; i < rridetype.ride_types.Count; i++)
+                    {
+                        TypeOfRideCollection.Add(rridetype.ride_types[i]);
+                    }
+                    if (TypeOfRideCollection.Count > 0)
+                    {
+                        RideTypeListView.SelectedIndex = 1;
+                        EtaInMinutes.Text = (rridetype.ride_types[1].eta_seconds / 60).ToString() + " MIN";
+                    }
+                    LyftNotPresent.Visibility = Visibility.Collapsed;
+                    LyftPresent.Visibility = Visibility.Visible;
+                }
+                else
+                {
+                    string error = await eta_response.Content.ReadAsStringAsync();
+                    RideTypeErrorObject rerror = RideType.DataDeserializerError(error);
+                    LyftPresent.Visibility = Visibility.Collapsed;
+                    LyftNotPresent.Visibility = Visibility.Visible;
+                }
             }
             else
             {
-                DownloadAvailableRideTypes(pos);
-            }
-        }
-
-        public async void DownloadAvailableRideTypes(Geoposition pos)
-        {
-            //string ride_type = await URIHelper.GetRequest(URIHelper.RIDE_TYPE_URI + "?lat=" + pos.Coordinate.Point.Position.Latitude.ToString() + "&lng=" + pos.Coordinate.Point.Position.Longitude.ToString());
-            //string eta = await URIHelper.GetRequest(URIHelper.ETA_URI + "?lat=" + pos.Coordinate.Point.Position.ToString() + "&lng=" + pos.Coordinate.Point.Position.Longitude.ToString());
-            string ride_type = await URIHelper.GetRequest(URIHelper.RIDE_TYPE_URI + "?lat=47.61" + "&lng=-122.33");
-            string eta = await URIHelper.GetRequest(URIHelper.ETA_URI + "?lat=47.61" + "&lng=-122.33");
-            RootObjectRideType rridetype = RideType.DataDeserializerRideType(ride_type);
-            RootObjectEtaEstimate retaestimate = RideType.DataDeserializerEtaEstimate(eta);
-            for (int i = 0; i < rridetype.ride_types.Count; i++)
-            {
-                for (int j = 0; j < retaestimate.eta_estimates.Count; j++)
-                {
-                    if (retaestimate.eta_estimates[j].ride_type == rridetype.ride_types[i].ride_type)
-                    {
-                        rridetype.ride_types[i].eta_seconds = retaestimate.eta_estimates[j].eta_seconds;
-                        break;
-                    }
-                }
-            }
-            TypeOfRideCollection.Clear();
-            for (int i = 0; i < rridetype.ride_types.Count; i++)
-            {
-                TypeOfRideCollection.Add(rridetype.ride_types[i]);
-            }
-            if (TypeOfRideCollection.Count > 0)
-            {
-                RideTypeListView.SelectedIndex = 1;
-                EtaInMinutes.Text = (rridetype.ride_types[1].eta_seconds / 60).ToString() + " MIN";
+                string error = await ride_type_response.Content.ReadAsStringAsync();
+                RideTypeErrorObject rerror = RideType.DataDeserializerError(error);
+                LyftPresent.Visibility = Visibility.Collapsed;
+                LyftNotPresent.Visibility = Visibility.Visible;
+                //EtaInMinutesLocationMarker.Text = "Lyft is not available here";
+                //LocationMarkerEllipseInner.Width = EtaInMinutesLocationMarker.Width + 5;
+                //LocationMarkerEllipseInner.Height = EtaInMinutesLocationMarker.Height + 5;
+                //LocationMarkerEllipseOuter.Width = LocationMarkerEllipseInner.Width + 3;
+                //LocationMarkerEllipseOuter.Height = LocationMarkerEllipseInner.Height + 3;
             }
         }
 
@@ -192,6 +226,8 @@ namespace LyftUWP.Pages
             {
                 var loc = result.Locations[0];
                 PickupAddressTextBlock.Text = result.Locations[0].Address.FormattedAddress;
+                BasicGeoposition pos = new BasicGeoposition { Latitude = loc.Point.Position.Latitude, Longitude = loc.Point.Position.Longitude, Altitude = loc.Point.Position.Altitude };
+                UpdateRideTypes(pos);
                 //RidesMap.MapElements.Clear();
                 //Geopoint myPoint = new Geopoint(new BasicGeoposition() { Latitude = 51, Longitude = 0 });
                 ////create POI
@@ -210,19 +246,23 @@ namespace LyftUWP.Pages
         private void SetPickupButton_Click(object sender, RoutedEventArgs e)
         {
             timer.Stop();
+            AddMapIcon(Settings.PICKUP_POINT, Settings.PICKUP_ADDRESS, "ms-appx:///Images/PickupIcon.png");
             HideSetPickupView();
             ShowSetDestinationView();
+            timer.Start();
         }
 
         private void SetDestinationGrid_AddPickup_Tapped(object sender, TappedRoutedEventArgs e)
         {
+            timer.Start();
             HideSetDestinationView();
             ShowSetPickupView();
         }
 
         private void SetDestinationGrid_AddDestination_Tapped(object sender, TappedRoutedEventArgs e)
         {
-
+            HideSetDestinationView();
+            ShowAddressSearchView(true);
         }
 
         private async void SearchBarTextBox_TextChanged(object sender, TextChangedEventArgs e)
@@ -257,22 +297,27 @@ namespace LyftUWP.Pages
 
         private async void AddressSearchListView_ItemClick(object sender, ItemClickEventArgs e)
         {
-            
+            timer.Stop();
             AddressSearch address = (AddressSearch)e.ClickedItem;
             BasicGeoposition pos = new BasicGeoposition { Latitude = address.latitude, Longitude = address.longitude };
+            Settings.PICKUP_ADDRESS = address.formatted_address;
+            Settings.PICKUP_POINT = pos;
+            PickupAddressTextBlock.Text = address.formatted_address;
+            SetDestinationGrid_AddPickup.Text = address.formatted_address;
             RidesMap.Center = new Geopoint(pos);
+            
             RidesMap.CenterChanged -= RidesMap_CenterChanged;
             SetMapZoomLevel(19);
             HideAddressSearchView();
             ShowSetPickupView();
-            await Task.Delay(1000);
+            await Task.Delay(1500);
+           // timer.Start();
             RidesMap.CenterChanged += RidesMap_CenterChanged;
-
         }
 
         private void SetDestinationButton_Click(object sender, RoutedEventArgs e)
         {
-
+            //HideSetDestinationView()
         }
 
         private void SetMapZoomLevel(int level)
@@ -283,14 +328,24 @@ namespace LyftUWP.Pages
 
         private void HideAddressSearchView()
         {
-            PickUpAddressSearchGrid.Visibility = Visibility.Collapsed;           
+            PickUpAddressSearchGrid.Visibility = Visibility.Collapsed;
+            DestinationAddressSearchGrid.Visibility = Visibility.Collapsed;
+            DestinationSearchBarTextBox.Text = "";
+            SearchBarTextBox.Text = "";        
             MapElementsGrid.Visibility = Visibility.Visible;
         }
 
-        private void ShowAddressSearchView()
+        private void ShowAddressSearchView(bool setDestination = false)
         {            
             MapElementsGrid.Visibility = Visibility.Collapsed;
-            PickUpAddressSearchGrid.Visibility = Visibility.Visible;
+            if (setDestination)
+            {
+                DestinationAddressSearchGrid.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                PickUpAddressSearchGrid.Visibility = Visibility.Visible;
+            }
         }
 
         private void HideSetPickupView()
@@ -322,6 +377,10 @@ namespace LyftUWP.Pages
         private void RidesMap_CenterChanged(MapControl sender, object args)
         {
             System.Diagnostics.Debug.WriteLine("Center Changed");
+            if (!timer.IsEnabled)
+            {
+                timer.Start();
+            }
         }
 
         private async void DestinationSearchBarTextBox_TextChanged(object sender, TextChangedEventArgs e)
@@ -355,7 +414,31 @@ namespace LyftUWP.Pages
 
         private void DestinationAddressSearchListView_ItemClick(object sender, ItemClickEventArgs e)
         {
+            AddressSearch address = (AddressSearch)e.ClickedItem;
+            BasicGeoposition pos = new BasicGeoposition { Latitude = address.latitude, Longitude = address.longitude };
+            //RidesMap.Center = new Geopoint(pos);
+            //RidesMap.CenterChanged -= RidesMap_CenterChanged;
+            SetDestinationGrid_AddDestination.Text = address.formatted_address;
+            Settings.DESTINATION_ADDRESS = address.formatted_address;
+            Settings.DESTINATION_POINT = new BasicGeoposition { Latitude = address.latitude, Longitude = address.longitude };
+            AddMapIcon(Settings.DESTINATION_POINT, Settings.DESTINATION_ADDRESS, "ms-appx:///Images/DestinationIcon.png");
+            SetMapZoomLevel(19);
+            HideAddressSearchView();
+            ShowSetDestinationView();
+            //await Task.Delay(1000);
+            //RidesMap.CenterChanged += RidesMap_CenterChanged;
+        }
 
+        private void AddMapIcon(BasicGeoposition position, string label, string pathToImage)
+        {
+            //RidesMap.MapElements.Clear();
+            Geopoint myPoint = new Geopoint(position);
+            ////create POI
+            MapIcon myPOI = new MapIcon { Location = myPoint, Title = label, ZIndex = 0, NormalizedAnchorPoint = new Point(0.5,1.0) };
+            myPOI.Image = RandomAccessStreamReference.CreateFromUri(new Uri(pathToImage));
+            ////// add to map and center it
+            RidesMap.MapElements.Add(myPOI);
+            var elem = RidesMap.MapElements.ToList();
         }
     }
 }
