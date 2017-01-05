@@ -21,6 +21,12 @@ namespace LyftUWP.Model
             RootObjectEtaEstimate retaestimate = JsonConvert.DeserializeObject<RootObjectEtaEstimate>(data);
             return retaestimate;
         }
+
+        public static RideTypeErrorObject DataDeserializerError(string data)
+        {
+            RideTypeErrorObject rerror = JsonConvert.DeserializeObject<RideTypeErrorObject>(data);
+            return rerror;
+        }
     }
     public class PricingDetails
     {
@@ -61,5 +67,10 @@ namespace LyftUWP.Model
         public List<EtaEstimate> eta_estimates { get; set; }
     }
 
+    public class RideTypeErrorObject
+    {
+        public string error_description { get; set; }
+        public string error { get; set; }
+    }
 
 }
