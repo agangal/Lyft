@@ -62,7 +62,7 @@ namespace LyftUWP.Helpers
             {
                 return null;
             }
-            return null;
+            //return null;
         }
 
         public static async Task<HttpResponseMessage> PostRequest(string api, string data)
