@@ -98,6 +98,7 @@
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
     <Compile Include="Helpers\AuthHelper.cs" />
+    <Compile Include="Helpers\RideSettings.cs" />
     <Compile Include="Helpers\Settings.cs" />
     <Compile Include="Helpers\URIHelper.cs" />
     <Compile Include="MainPage.xaml.cs">
