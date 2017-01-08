@@ -246,7 +246,7 @@ namespace LyftUWP.Pages
         private void SetPickupButton_Click(object sender, RoutedEventArgs e)
         {
             timer.Stop();
-            AddMapIcon(Settings.PICKUP_POINT, Settings.PICKUP_ADDRESS, "ms-appx:///Images/PickupIcon.png");
+            AddMapIcon(RideSettings.PICKUP_POINT, RideSettings.PICKUP_ADDRESS, "ms-appx:///Images/PickupIcon.png");
             HideSetPickupView();
             ShowSetDestinationView();
             timer.Start();
@@ -300,8 +300,8 @@ namespace LyftUWP.Pages
             timer.Stop();
             AddressSearch address = (AddressSearch)e.ClickedItem;
             BasicGeoposition pos = new BasicGeoposition { Latitude = address.latitude, Longitude = address.longitude };
-            Settings.PICKUP_ADDRESS = address.formatted_address;
-            Settings.PICKUP_POINT = pos;
+            RideSettings.PICKUP_ADDRESS = address.formatted_address;
+            RideSettings.PICKUP_POINT = pos;
             PickupAddressTextBlock.Text = address.formatted_address;
             SetDestinationGrid_AddPickup.Text = address.formatted_address;
             RidesMap.Center = new Geopoint(pos);
@@ -419,9 +419,9 @@ namespace LyftUWP.Pages
             //RidesMap.Center = new Geopoint(pos);
             //RidesMap.CenterChanged -= RidesMap_CenterChanged;
             SetDestinationGrid_AddDestination.Text = address.formatted_address;
-            Settings.DESTINATION_ADDRESS = address.formatted_address;
-            Settings.DESTINATION_POINT = new BasicGeoposition { Latitude = address.latitude, Longitude = address.longitude };
-            AddMapIcon(Settings.DESTINATION_POINT, Settings.DESTINATION_ADDRESS, "ms-appx:///Images/DestinationIcon.png");
+            RideSettings.DESTINATION_ADDRESS = address.formatted_address;
+            RideSettings.DESTINATION_POINT = new BasicGeoposition { Latitude = address.latitude, Longitude = address.longitude };
+            AddMapIcon(RideSettings.DESTINATION_POINT, RideSettings.DESTINATION_ADDRESS, "ms-appx:///Images/DestinationIcon.png");
             SetMapZoomLevel(19);
             HideAddressSearchView();
             ShowSetDestinationView();
