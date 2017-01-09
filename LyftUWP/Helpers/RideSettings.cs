@@ -41,5 +41,9 @@ namespace LyftUWP.Helpers
             get { return ApplicationData.Current.LocalSettings.Values["DESTINATION_ADDRESS"].ToString(); }
             set { ApplicationData.Current.LocalSettings.Values["DESTINATION_ADDRESS"] = value; }
         }
+
+        public static string RideType { get; set; }
+
+        public static string RideTypeResponse { get; set; }
     }
 }

@@ -101,34 +101,38 @@ namespace LyftUWP.Pages
                 if (eta_response.IsSuccessStatusCode)
                 {
                     string ride_type = await ride_type_response.Content.ReadAsStringAsync();
-                    string eta = await eta_response.Content.ReadAsStringAsync();
-                    //string ride_type = await URIHelper.GetRequest(URIHelper.RIDE_TYPE_URI + "?lat=47.61" + "&lng=-122.33");
-                    //string eta = await URIHelper.GetRequest(URIHelper.ETA_URI + "?lat=47.61" + "&lng=-122.33");
-                    RootObjectRideType rridetype = RideType.DataDeserializerRideType(ride_type);
-                    RootObjectEtaEstimate retaestimate = RideType.DataDeserializerEtaEstimate(eta);
-                    for (int i = 0; i < rridetype.ride_types.Count; i++)
+                    if (String.Compare(ride_type, RideSettings.RideTypeResponse, true) != 0)
                     {
-                        for (int j = 0; j < retaestimate.eta_estimates.Count; j++)
+                        RideSettings.RideTypeResponse = ride_type;
+                        string eta = await eta_response.Content.ReadAsStringAsync();
+                        //string ride_type = await URIHelper.GetRequest(URIHelper.RIDE_TYPE_URI + "?lat=47.61" + "&lng=-122.33");
+                        //string eta = await URIHelper.GetRequest(URIHelper.ETA_URI + "?lat=47.61" + "&lng=-122.33");
+                        RootObjectRideType rridetype = RideType.DataDeserializerRideType(ride_type);
+                        RootObjectEtaEstimate retaestimate = RideType.DataDeserializerEtaEstimate(eta);
+                        for (int i = 0; i < rridetype.ride_types.Count; i++)
                         {
-                            if (retaestimate.eta_estimates[j].ride_type == rridetype.ride_types[i].ride_type)
+                            for (int j = 0; j < retaestimate.eta_estimates.Count; j++)
                             {
-                                rridetype.ride_types[i].eta_seconds = retaestimate.eta_estimates[j].eta_seconds;
-                                break;
+                                if (retaestimate.eta_estimates[j].ride_type == rridetype.ride_types[i].ride_type)
+                                {
+                                    rridetype.ride_types[i].eta_seconds = retaestimate.eta_estimates[j].eta_seconds;
+                                    break;
+                                }
                             }
                         }
+                        TypeOfRideCollection.Clear();
+                        for (int i = 0; i < rridetype.ride_types.Count; i++)
+                        {
+                            TypeOfRideCollection.Add(rridetype.ride_types[i]);
+                        }
+                        if (TypeOfRideCollection.Count > 0)
+                        {
+                            RideTypeListView.SelectedIndex = 1;
+                            EtaInMinutes.Text = (rridetype.ride_types[1].eta_seconds / 60).ToString() + " MIN";
+                        }
+                        LyftNotPresent.Visibility = Visibility.Collapsed;
+                        LyftPresent.Visibility = Visibility.Visible;
                     }
-                    TypeOfRideCollection.Clear();
-                    for (int i = 0; i < rridetype.ride_types.Count; i++)
-                    {
-                        TypeOfRideCollection.Add(rridetype.ride_types[i]);
-                    }
-                    if (TypeOfRideCollection.Count > 0)
-                    {
-                        RideTypeListView.SelectedIndex = 1;
-                        EtaInMinutes.Text = (rridetype.ride_types[1].eta_seconds / 60).ToString() + " MIN";
-                    }
-                    LyftNotPresent.Visibility = Visibility.Collapsed;
-                    LyftPresent.Visibility = Visibility.Visible;
                 }
                 else
                 {
@@ -224,16 +228,22 @@ namespace LyftUWP.Pages
             MapLocationFinderResult result = await MapLocationFinder.FindLocationsAtAsync(location);
             if (result.Status == MapLocationFinderStatus.Success)
             {
-                var loc = result.Locations[0];
-                PickupAddressTextBlock.Text = result.Locations[0].Address.FormattedAddress;
-                BasicGeoposition pos = new BasicGeoposition { Latitude = loc.Point.Position.Latitude, Longitude = loc.Point.Position.Longitude, Altitude = loc.Point.Position.Altitude };
-                UpdateRideTypes(pos);
-                //RidesMap.MapElements.Clear();
-                //Geopoint myPoint = new Geopoint(new BasicGeoposition() { Latitude = 51, Longitude = 0 });
-                ////create POI
-                //MapIcon myPOI = new MapIcon { Location = location, Title = "My position", ZIndex = 0 };
-                ////// add to map and center it
-                //RidesMap.MapElements.Add(myPOI);               
+                if (result.Locations != null)
+                {
+                    var locList = result.Locations.ToList();
+                    if (locList.Count > 0)
+                    {
+                        PickupAddressTextBlock.Text = locList[0].Address.FormattedAddress;
+                        BasicGeoposition pos = new BasicGeoposition { Latitude = locList[0].Point.Position.Latitude, Longitude = locList[0].Point.Position.Longitude, Altitude = locList[0].Point.Position.Altitude };
+                        UpdateRideTypes(pos);
+                    }
+                    //RidesMap.MapElements.Clear();
+                    //Geopoint myPoint = new Geopoint(new BasicGeoposition() { Latitude = 51, Longitude = 0 });
+                    ////create POI
+                    //MapIcon myPOI = new MapIcon { Location = location, Title = "My position", ZIndex = 0 };
+                    ////// add to map and center it
+                    //RidesMap.MapElements.Add(myPOI);       
+                }        
             }
         }
 
@@ -311,7 +321,7 @@ namespace LyftUWP.Pages
             HideAddressSearchView();
             ShowSetPickupView();
             await Task.Delay(1500);
-           // timer.Start();
+            timer.Start();
             RidesMap.CenterChanged += RidesMap_CenterChanged;
         }
 
