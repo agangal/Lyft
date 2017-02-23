@@ -32,6 +32,7 @@ namespace LyftUWP.Pages
     using Windows.Storage.Streams;
     using Windows.System.Threading;
     using Windows.UI.Xaml.Controls.Maps;
+    using Windows.UI.Xaml.Media.Imaging;
     using Windows.Web.Http;
 
     /// <summary>
@@ -116,8 +117,11 @@ namespace LyftUWP.Pages
                             {
                                 if (retaestimate.eta_estimates[j].ride_type == rridetype.ride_types[i].ride_type)
                                 {
-                                    rridetype.ride_types[i].eta_seconds = retaestimate.eta_estimates[j].eta_seconds;
-                                    break;
+                                    if (retaestimate.eta_estimates[j].eta_seconds != null)
+                                    {
+                                        rridetype.ride_types[i].eta_seconds = retaestimate.eta_estimates[j].eta_seconds;
+                                        break;
+                                    }
                                 }
                             }
                         }
@@ -130,6 +134,7 @@ namespace LyftUWP.Pages
                         {
                             RideTypeListView.SelectedIndex = 1;
                             EtaInMinutes.Text = (rridetype.ride_types[1].eta_seconds / 60).ToString() + " MIN";
+                            ChangeEtaMapIcon(rridetype.ride_types[1].eta_seconds);
                         }
                         LyftNotPresent.Visibility = Visibility.Collapsed;
                         LyftPresent.Visibility = Visibility.Visible;
@@ -155,6 +160,107 @@ namespace LyftUWP.Pages
                 //LocationMarkerEllipseInner.Height = EtaInMinutesLocationMarker.Height + 5;
                 //LocationMarkerEllipseOuter.Width = LocationMarkerEllipseInner.Width + 3;
                 //LocationMarkerEllipseOuter.Height = LocationMarkerEllipseInner.Height + 3;
+            }
+        }
+
+        private void ChangeEtaMapIcon(int seconds)
+        {
+            int minutes = (int)seconds / 60;
+            switch (minutes)
+            {
+                case 1:
+                    EtaMapIcon.Source = new BitmapImage(new Uri("ms-appx:///Images/MapMarker/min1_2x.png"));
+                    break;
+                case 2:
+                    EtaMapIcon.Source = new BitmapImage(new Uri("ms-appx:///Images/MapMarker/min2_2x.png"));
+                    break;
+                case 3:
+                    EtaMapIcon.Source = new BitmapImage(new Uri("ms-appx:///Images/MapMarker/min3_2x.png"));
+                    break;
+                case 4:
+                    EtaMapIcon.Source = new BitmapImage(new Uri("ms-appx:///Images/MapMarker/min4_2x.png"));
+                    break;
+                case 5:
+                    EtaMapIcon.Source = new BitmapImage(new Uri("ms-appx:///Images/MapMarker/min5_2x.png"));
+                    break;
+                case 6:
+                    EtaMapIcon.Source = new BitmapImage(new Uri("ms-appx:///Images/MapMarker/min6_2x.png"));
+                    break;
+                case 7:
+                    EtaMapIcon.Source = new BitmapImage(new Uri("ms-appx:///Images/MapMarker/min7_2x.png"));
+                    break;
+                case 8:
+                    EtaMapIcon.Source = new BitmapImage(new Uri("ms-appx:///Images/MapMarker/min8_2x.png"));
+                    break;
+                case 9:
+                    EtaMapIcon.Source = new BitmapImage(new Uri("ms-appx:///Images/MapMarker/min9@2x.png"));
+                    break;
+                case 10:
+                    EtaMapIcon.Source = new BitmapImage(new Uri("ms-appx:///Images/MapMarker/min10.png"));
+                    break;
+                case 11:
+                    EtaMapIcon.Source = new BitmapImage(new Uri("ms-appx:///Images/MapMarker/min11.png"));
+                    break;
+                case 12:
+                    EtaMapIcon.Source = new BitmapImage(new Uri("ms-appx:///Images/MapMarker/min12.png"));
+                    break;
+                case 13:
+                    EtaMapIcon.Source = new BitmapImage(new Uri("ms-appx:///Images/MapMarker/min13.png"));
+                    break;
+                case 14:
+                    EtaMapIcon.Source = new BitmapImage(new Uri("ms-appx:///Images/MapMarker/min14.png"));
+                    break;
+                case 15:
+                    EtaMapIcon.Source = new BitmapImage(new Uri("ms-appx:///Images/MapMarker/min15.png"));
+                    break;
+                case 16:
+                    EtaMapIcon.Source = new BitmapImage(new Uri("ms-appx:///Images/MapMarker/min16.png"));
+                    break;
+                case 17:
+                    EtaMapIcon.Source = new BitmapImage(new Uri("ms-appx:///Images/MapMarker/min17.png"));
+                    break;
+                case 18:
+                    EtaMapIcon.Source = new BitmapImage(new Uri("ms-appx:///Images/MapMarker/min18.png"));
+                    break;
+                case 19:
+                    EtaMapIcon.Source = new BitmapImage(new Uri("ms-appx:///Images/MapMarker/min19.png"));
+                    break;
+                case 20:
+                    EtaMapIcon.Source = new BitmapImage(new Uri("ms-appx:///Images/MapMarker/min20.png"));
+                    break;
+                case 21:
+                    EtaMapIcon.Source = new BitmapImage(new Uri("ms-appx:///Images/MapMarker/min21.png"));
+                    break;
+                case 22:
+                    EtaMapIcon.Source = new BitmapImage(new Uri("ms-appx:///Images/MapMarker/min22.png"));
+                    break;
+                case 23:
+                    EtaMapIcon.Source = new BitmapImage(new Uri("ms-appx:///Images/MapMarker/min23.png"));
+                    break;
+                case 24:
+                    EtaMapIcon.Source = new BitmapImage(new Uri("ms-appx:///Images/MapMarker/min24.png"));
+                    break;
+                case 25:
+                    EtaMapIcon.Source = new BitmapImage(new Uri("ms-appx:///Images/MapMarker/min25.png"));
+                    break;
+                case 26:
+                    EtaMapIcon.Source = new BitmapImage(new Uri("ms-appx:///Images/MapMarker/min26.png"));
+                    break;
+                case 27:
+                    EtaMapIcon.Source = new BitmapImage(new Uri("ms-appx:///Images/MapMarker/min27.png"));
+                    break;
+                case 28:
+                    EtaMapIcon.Source = new BitmapImage(new Uri("ms-appx:///Images/MapMarker/min28.png"));
+                    break;
+                case 29:
+                    EtaMapIcon.Source = new BitmapImage(new Uri("ms-appx:///Images/MapMarker/min29.png"));
+                    break;
+                case 30:
+                    EtaMapIcon.Source = new BitmapImage(new Uri("ms-appx:///Images/MapMarker/min30.png"));
+                    break;
+                default:
+                    EtaMapIcon.Source = new BitmapImage(new Uri("ms-appx:///Images/MapMarker/mingreater30.png"));
+                    break;               
             }
         }
 
@@ -223,6 +329,7 @@ namespace LyftUWP.Pages
             ShowRideTypesButtonGrid.Visibility = Visibility.Collapsed;
             TypeOfRide ridetype = e.ClickedItem as TypeOfRide;
             EtaInMinutes.Text = (ridetype.eta_seconds / 60).ToString() + " MIN";
+            ChangeEtaMapIcon(ridetype.eta_seconds);
         }
 
         private async void GeocodeLocationMarker(Geopoint location)
