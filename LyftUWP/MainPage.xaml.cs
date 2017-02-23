@@ -42,6 +42,15 @@ namespace LyftUWP
                     Frame rootFrame = Window.Current.Content as Frame;
                     rootFrame.Navigate(typeof(RidesPage));
                 }
+                else
+                {
+                    message = await AuthHelper.RefreshAccessToken();
+                    if (message != null && message.IsSuccessStatusCode)
+                    {
+                        Frame rootFrame = Window.Current.Content as Frame;
+                        rootFrame.Navigate(typeof(RidesPage));
+                    }
+                }
                 
             }
         }
