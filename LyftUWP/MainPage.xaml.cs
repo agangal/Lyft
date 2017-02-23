@@ -19,6 +19,8 @@ namespace LyftUWP
 {
     using Helpers;
     using Pages;
+    using Windows.Web.Http;
+
     /// <summary>
     /// An empty page that can be used on its own or navigated to within a Frame.
     /// </summary>
@@ -29,30 +31,65 @@ namespace LyftUWP
             this.InitializeComponent();
         }
 
-        protected override void OnNavigatedTo(NavigationEventArgs e)
+        protected override async void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
-           
+            if (!String.IsNullOrEmpty(Settings.AUTHORIZATION_CODE))
+            {
+                HttpResponseMessage message = await AuthHelper.CheckIfAccessTokenIsValid();
+                if (message.IsSuccessStatusCode)
+                {
+                    Frame rootFrame = Window.Current.Content as Frame;
+                    rootFrame.Navigate(typeof(RidesPage));
+                }
+                
+            }
         }
 
         private async void SignIn_Click(object sender, RoutedEventArgs e)
         {
+            HttpResponseMessage message = new HttpResponseMessage();
+       
             if (!String.IsNullOrEmpty(Settings.AUTHORIZATION_CODE))
             {
-                if (!await AuthHelper.CheckIfAccessTokenIsValid())
+                message = await AuthHelper.CheckIfAccessTokenIsValid();
+                if (!message.IsSuccessStatusCode)
                 {
-                    if (!await AuthHelper.GetAccessToken())
+                    if (!String.IsNullOrEmpty(Settings.REFRESH_TOKEN))
                     {
-                        await Helpers.AuthHelper.UserSignIn();
+                        message = await AuthHelper.RefreshAccessToken();
+                        if (message != null && message.IsSuccessStatusCode)
+                        {
+                            Frame rootFrame = Window.Current.Content as Frame;
+                            rootFrame.Navigate(typeof(RidesPage));
+                        }
+                        else
+                        {
+                            if (await Helpers.AuthHelper.UserSignIn())
+                            {
+                                Frame rootFrame = Window.Current.Content as Frame;
+                                rootFrame.Navigate(typeof(RidesPage));
+                            }
+                        }
                     }
+                    else
+                    {
+                        if (await AuthHelper.UserSignIn())
+                        {
+                            Frame rootFrame = Window.Current.Content as Frame;
+                            rootFrame.Navigate(typeof(RidesPage));
+                        }
+                    }               
                 }
             }
             else
             {
-                await Helpers.AuthHelper.UserSignIn();
-            }
-            Frame rootFrame = Window.Current.Content as Frame;
-            rootFrame.Navigate(typeof(RidesPage));
+                if (await Helpers.AuthHelper.UserSignIn())
+                {
+                    Frame rootFrame = Window.Current.Content as Frame;
+                    rootFrame.Navigate(typeof(RidesPage));
+                }
+            }            
         }
     }
 }

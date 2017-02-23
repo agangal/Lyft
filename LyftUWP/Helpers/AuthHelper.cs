@@ -14,7 +14,7 @@ namespace LyftUWP.Helpers
     {
         public static async Task<bool> GetAuthorizationCode()
         {
-            string authurl = URIHelper.AUTHORIZATION_CODE_URI + "?client_id=" + Settings.CLIENT_ID + "&response_type=code&scope=public&state=" + Settings.STATE;
+            string authurl = URIHelper.AUTHORIZATION_CODE_URI + "?client_id=" + Settings.CLIENT_ID + "&response_type=code&scope=offline public&state=" + Settings.STATE;
             Uri StartUri = new Uri(authurl);
             Uri EndUri = new Uri("https://ashishgangal.com/");
             WebAuthenticationResult WebAuthResult = await WebAuthenticationBroker.AuthenticateAsync(WebAuthenticationOptions.None, StartUri, EndUri);
@@ -49,8 +49,11 @@ namespace LyftUWP.Helpers
                 {
                     string resp = await httpresponseMessage.Content.ReadAsStringAsync();
                     var obj = JsonConvert.DeserializeObject<AccessTokenObject>(resp);
-                    string conststr = "SANDBOX-";                  
-                    Settings.ACCESS_TOKEN = obj.access_token.Substring(conststr.Length, obj.access_token.Length - conststr.Length);
+                    //string conststr = "SANDBOX-";
+                    //Settings.ACCESS_TOKEN = obj.          
+                    //StoreAccessToken(obj.access_token.Substring(conststr.Length, obj.access_token.Length - conststr.Length));
+                    StoreAccessToken(obj.access_token);
+                    StoreRefreshToken(obj.refresh_token);
                 }
                 else
                 {
@@ -64,39 +67,58 @@ namespace LyftUWP.Helpers
             return true;
         }
 
-        public static async Task<bool> CheckIfAccessTokenIsValid()
+        public static async Task<HttpResponseMessage> CheckIfAccessTokenIsValid()
         {
             HttpClient httpclient = new HttpClient();
             try
             {
                 httpclient.DefaultRequestHeaders.Authorization = new Windows.Web.Http.Headers.HttpCredentialsHeaderValue("Bearer", Settings.ACCESS_TOKEN);
                 var httpresponsemessage = await httpclient.GetAsync(new Uri("https://api.lyft.com/v1/ridetypes?lat=37.7833&lng=-122.4167"));
-                return (httpresponsemessage.IsSuccessStatusCode);              
+                return (httpresponsemessage);              
             }
             catch (Exception ex)
             {
-                return false;
+                return null;
             }            
         }
-        //public static async Task<bool> RefreshAccessToken()
-        //{
-        //    HttpClient httpClient = new HttpClient();
-        //    try
-        //    {
-        //        string content = "client_id=" + Settings.CLIENT_ID + "&client_secret=" + Settings.CLIENT_SECRET + "&redirect_uri=https%3A%2F%2Fashishgangal.com%2F&grant_type=authorization_code&state=" + Settings.STATE + "&code=" + Settings.AUTHORIZATION_CODE;
-        //        HttpStringContent stringcont = new HttpStringContent(content);
-        //        var bytearray = Encoding.ASCII.GetBytes(Settings.CLIENT_ID + ":" + Settings.CLIENT_SECRET);
-        //        httpClient.DefaultRequestHeaders.TryAppendWithoutValidation("Authorization", "Basic " + Convert.ToBase64String(bytearray));
-        //        stringcont.Headers.ContentType = new HttpMediaTypeHeaderValue("application/x-www-form-urlencoded");
-        //        var httpresponseMessage = await httpClient.PostAsync(new Uri(Settings.ACCESS_TOKEN_URI), stringcont);
-        //        string resp = await httpresponseMessage.Content.ReadAsStringAsync();
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return false;
-        //    }
-        //    return true;
-        //}
+
+        private static void StoreAccessToken(string accesstoken)
+        {
+            Settings.ACCESS_TOKEN = accesstoken;
+        }
+
+        private static void StoreRefreshToken(string refreshtoken)
+        {
+            Settings.REFRESH_TOKEN = refreshtoken;
+        }
+        public static async Task<HttpResponseMessage> RefreshAccessToken()
+        {
+            HttpClient httpClient = new HttpClient();
+
+            try
+            {                
+                string content = "client_id=" + Settings.CLIENT_ID + "&client_secret=" + Settings.CLIENT_SECRET + "&redirect_uri=https%3A%2F%2Fashishgangal.com%2F&grant_type=refresh_token&state=" + Settings.STATE + "&refresh_token=" + Settings.REFRESH_TOKEN;
+                HttpStringContent stringcont = new HttpStringContent(content);
+                var bytearray = Encoding.ASCII.GetBytes(Settings.CLIENT_ID + ":" + Settings.CLIENT_SECRET);
+                httpClient.DefaultRequestHeaders.TryAppendWithoutValidation("Authorization", "Basic " + Convert.ToBase64String(bytearray));
+                stringcont.Headers.ContentType = new HttpMediaTypeHeaderValue("application/x-www-form-urlencoded");
+                var httpresponseMessage = await httpClient.PostAsync(new Uri(URIHelper.ACCESS_TOKEN_URI), stringcont);
+                if (httpresponseMessage.IsSuccessStatusCode)
+                {
+                    string resp = await httpresponseMessage.Content.ReadAsStringAsync();
+                    var obj = JsonConvert.DeserializeObject<AccessTokenObject>(resp);
+                    //string conststr = "SANDBOX-";
+                    //Settings.ACCESS_TOKEN = obj.          
+                    //StoreAccessToken(obj.access_token.Substring(conststr.Length, obj.access_token.Length - conststr.Length));
+                }
+                return httpresponseMessage;
+            }
+            catch (Exception ex)
+            {
+                
+            }
+            return null;
+        }
 
         public static async Task<bool> UserSignIn()
         {
@@ -114,7 +136,8 @@ namespace LyftUWP.Helpers
             public string token_type { get; set; }
             public string access_token { get; set; }
             public int expires_in { get; set; }
-            public string scope { get; set; }
+            public string refresh_token { get; set; }
+            public string scope { get; set; }            
         }
     }
 }
