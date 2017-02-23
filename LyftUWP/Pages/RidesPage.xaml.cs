@@ -59,6 +59,7 @@ namespace LyftUWP.Pages
         protected override void OnNavigatingFrom(NavigatingCancelEventArgs e)
         {
             base.OnNavigatingFrom(e);
+            timer.Tick -= Timer_Tick;
             timer.Stop();
         }
 
@@ -146,6 +147,7 @@ namespace LyftUWP.Pages
             {
                 string error = await ride_type_response.Content.ReadAsStringAsync();
                 RideTypeErrorObject rerror = RideType.DataDeserializerError(error);
+                //if (rerror.)
                 LyftPresent.Visibility = Visibility.Collapsed;
                 LyftNotPresent.Visibility = Visibility.Visible;
                 //EtaInMinutesLocationMarker.Text = "Lyft is not available here";
@@ -255,15 +257,18 @@ namespace LyftUWP.Pages
 
         private void SetPickupButton_Click(object sender, RoutedEventArgs e)
         {
+            timer.Tick -= Timer_Tick;
             timer.Stop();
             AddMapIcon(RideSettings.PICKUP_POINT, RideSettings.PICKUP_ADDRESS, "ms-appx:///Images/PickupIcon.png");
             HideSetPickupView();
             ShowSetDestinationView();
+            timer.Tick += Timer_Tick;
             timer.Start();
         }
 
         private void SetDestinationGrid_AddPickup_Tapped(object sender, TappedRoutedEventArgs e)
         {
+            timer.Tick += Timer_Tick;
             timer.Start();
             HideSetDestinationView();
             ShowSetPickupView();
@@ -307,6 +312,7 @@ namespace LyftUWP.Pages
 
         private async void AddressSearchListView_ItemClick(object sender, ItemClickEventArgs e)
         {
+            timer.Tick -= Timer_Tick;
             timer.Stop();
             AddressSearch address = (AddressSearch)e.ClickedItem;
             BasicGeoposition pos = new BasicGeoposition { Latitude = address.latitude, Longitude = address.longitude };
@@ -321,6 +327,7 @@ namespace LyftUWP.Pages
             HideAddressSearchView();
             ShowSetPickupView();
             await Task.Delay(1500);
+            timer.Tick += Timer_Tick;
             timer.Start();
             RidesMap.CenterChanged += RidesMap_CenterChanged;
         }
@@ -389,6 +396,7 @@ namespace LyftUWP.Pages
             System.Diagnostics.Debug.WriteLine("Center Changed");
             if (!timer.IsEnabled)
             {
+                timer.Tick += Timer_Tick;
                 timer.Start();
             }
         }
@@ -421,7 +429,7 @@ namespace LyftUWP.Pages
                 AddressOptions.Clear();
             }
         }
-
+        
         private void DestinationAddressSearchListView_ItemClick(object sender, ItemClickEventArgs e)
         {
             AddressSearch address = (AddressSearch)e.ClickedItem;
@@ -449,6 +457,11 @@ namespace LyftUWP.Pages
             ////// add to map and center it
             RidesMap.MapElements.Add(myPOI);
             var elem = RidesMap.MapElements.ToList();
+        }
+
+        private void ChangeUIForHttpResponse(HttpResponseMessage message)
+        {
+
         }
     }
 }
