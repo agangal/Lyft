@@ -14,7 +14,7 @@ namespace LyftUWP.Helpers
     {
         public static async Task<bool> GetAuthorizationCode()
         {
-            string authurl = URIHelper.AUTHORIZATION_CODE_URI + "?client_id=" + Settings.CLIENT_ID + "&response_type=code&scope=offline public&state=" + Settings.STATE;
+            string authurl = URIHelper.AUTHORIZATION_CODE_URI + "?client_id=" + Settings.CLIENT_ID + "&response_type=code&scope=offline public rides.read profile rides.request&state=" + Settings.STATE;
             Uri StartUri = new Uri(authurl);
             Uri EndUri = new Uri("https://ashishgangal.com/");
             WebAuthenticationResult WebAuthResult = await WebAuthenticationBroker.AuthenticateAsync(WebAuthenticationOptions.None, StartUri, EndUri);
@@ -39,9 +39,9 @@ namespace LyftUWP.Helpers
             HttpClient httpClient = new HttpClient();
             try
             {
-                string content = "client_id="+ Settings.CLIENT_ID + "&client_secret=" + Settings.CLIENT_SECRET + "&redirect_uri=https%3A%2F%2Fashishgangal.com%2F&grant_type=authorization_code&state="+ Settings.STATE + "&code=" + Settings.AUTHORIZATION_CODE;
+                string content = "client_id="+ Settings.CLIENT_ID + "&client_secret=SANDBOX-" + Settings.CLIENT_SECRET + "&redirect_uri=https%3A%2F%2Fashishgangal.com%2F&grant_type=authorization_code&state="+ Settings.STATE + "&code=" + Settings.AUTHORIZATION_CODE;
                 HttpStringContent stringcont = new HttpStringContent(content);                
-                var bytearray = Encoding.ASCII.GetBytes(Settings.CLIENT_ID + ":"+ Settings.CLIENT_SECRET);
+                var bytearray = Encoding.ASCII.GetBytes(Settings.CLIENT_ID + ":SANDBOX-"+ Settings.CLIENT_SECRET);
                 httpClient.DefaultRequestHeaders.TryAppendWithoutValidation("Authorization", "Basic " + Convert.ToBase64String(bytearray));
                 stringcont.Headers.ContentType = new HttpMediaTypeHeaderValue("application/x-www-form-urlencoded");
                 var httpresponseMessage = await httpClient.PostAsync(new Uri(URIHelper.ACCESS_TOKEN_URI), stringcont);
@@ -49,10 +49,10 @@ namespace LyftUWP.Helpers
                 {
                     string resp = await httpresponseMessage.Content.ReadAsStringAsync();
                     var obj = JsonConvert.DeserializeObject<AccessTokenObject>(resp);
-                    //string conststr = "SANDBOX-";
-                    //Settings.ACCESS_TOKEN = obj.          
-                    //StoreAccessToken(obj.access_token.Substring(conststr.Length, obj.access_token.Length - conststr.Length));
-                    StoreAccessToken(obj.access_token);
+                    
+                         
+                    StoreSandboxBearerToken(obj.access_token);
+                    //StoreAccessToken(obj.access_token);
                     StoreRefreshToken(obj.refresh_token);
                 }
                 else
@@ -87,6 +87,12 @@ namespace LyftUWP.Helpers
             Settings.ACCESS_TOKEN = accesstoken;
         }
 
+        public static void StoreSandboxBearerToken(string token)
+        {
+            string conststr = "SANDBOX-";
+            string bearertoken = token.Substring(conststr.Length, token.Length - conststr.Length);
+            Settings.ACCESS_TOKEN = bearertoken;
+        }
         private static void StoreRefreshToken(string refreshtoken)
         {
             Settings.REFRESH_TOKEN = refreshtoken;
@@ -94,12 +100,11 @@ namespace LyftUWP.Helpers
         public static async Task<HttpResponseMessage> RefreshAccessToken()
         {
             HttpClient httpClient = new HttpClient();
-
             try
             {                
-                string content = "client_id=" + Settings.CLIENT_ID + "&client_secret=" + Settings.CLIENT_SECRET + "&redirect_uri=https%3A%2F%2Fashishgangal.com%2F&grant_type=refresh_token&state=" + Settings.STATE + "&refresh_token=" + Settings.REFRESH_TOKEN;
+                string content = "client_id=" + Settings.CLIENT_ID + "&client_secret=SANDBOX-" + Settings.CLIENT_SECRET + "&redirect_uri=https%3A%2F%2Fashishgangal.com%2F&grant_type=refresh_token&state=" + Settings.STATE + "&refresh_token=" + Settings.REFRESH_TOKEN;
                 HttpStringContent stringcont = new HttpStringContent(content);
-                var bytearray = Encoding.ASCII.GetBytes(Settings.CLIENT_ID + ":" + Settings.CLIENT_SECRET);
+                var bytearray = Encoding.ASCII.GetBytes(Settings.CLIENT_ID + ":SANDBOX-" + Settings.CLIENT_SECRET);
                 httpClient.DefaultRequestHeaders.TryAppendWithoutValidation("Authorization", "Basic " + Convert.ToBase64String(bytearray));
                 stringcont.Headers.ContentType = new HttpMediaTypeHeaderValue("application/x-www-form-urlencoded");
                 var httpresponseMessage = await httpClient.PostAsync(new Uri(URIHelper.ACCESS_TOKEN_URI), stringcont);
@@ -107,11 +112,9 @@ namespace LyftUWP.Helpers
                 {
                     string resp = await httpresponseMessage.Content.ReadAsStringAsync();
                     var obj = JsonConvert.DeserializeObject<AccessTokenObject>(resp);
-                    StoreAccessToken(obj.access_token);
-                    //StoreRefreshToken(obj.refresh_token);
-                    //string conststr = "SANDBOX-";
-                    //Settings.ACCESS_TOKEN = obj.          
-                    //StoreAccessToken(obj.access_token.Substring(conststr.Length, obj.access_token.Length - conststr.Length));
+                    //StoreAccessToken(obj.access_token);
+                    //StoreRefreshToken(obj.refresh_token);                      
+                    StoreSandboxBearerToken(obj.access_token);
                 }
                 return httpresponseMessage;
             }
