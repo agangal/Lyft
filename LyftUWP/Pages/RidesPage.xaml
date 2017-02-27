@@ -68,7 +68,7 @@
                             <TextBlock Text="min" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="10"></TextBlock>
                         </StackPanel>
                     </Grid>-->
-                    <Image x:Name="EtaMapIcon" Height="60"></Image>
+                    <Image x:Name="EtaMapIcon" Height="60" Margin="0,0,0,15"></Image>
                 </StackPanel>
                 <StackPanel x:Name="LyftNotPresent" Visibility="Collapsed" Orientation="Vertical" Grid.Row="0" VerticalAlignment="Bottom">
                     <Grid Padding="0" Background="#352384" BorderBrush="White" BorderThickness="3" CornerRadius="10">

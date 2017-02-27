@@ -19,6 +19,8 @@ namespace LyftUWP
 {
     using Helpers;
     using Pages;
+    using System.Threading.Tasks;
+    using Windows.Devices.Geolocation;
     using Windows.Web.Http;
 
     /// <summary>
@@ -37,18 +39,16 @@ namespace LyftUWP
             if (!String.IsNullOrEmpty(Settings.AUTHORIZATION_CODE))
             {
                 HttpResponseMessage message = await AuthHelper.CheckIfAccessTokenIsValid();
-                if (message.IsSuccessStatusCode)
+                if (message != null && message.IsSuccessStatusCode)
                 {
-                    Frame rootFrame = Window.Current.Content as Frame;
-                    rootFrame.Navigate(typeof(RidesPage));
+                    GoToRidesPage();
                 }
                 else
                 {
                     message = await AuthHelper.RefreshAccessToken();
                     if (message != null && message.IsSuccessStatusCode)
                     {
-                        Frame rootFrame = Window.Current.Content as Frame;
-                        rootFrame.Navigate(typeof(RidesPage));
+                        GoToRidesPage();
                     }
                 }
                 
@@ -62,22 +62,20 @@ namespace LyftUWP
             if (!String.IsNullOrEmpty(Settings.AUTHORIZATION_CODE))
             {
                 message = await AuthHelper.CheckIfAccessTokenIsValid();
-                if (!message.IsSuccessStatusCode)
+                if (message != null && !message.IsSuccessStatusCode)
                 {
                     if (!String.IsNullOrEmpty(Settings.REFRESH_TOKEN))
                     {
                         message = await AuthHelper.RefreshAccessToken();
                         if (message != null && message.IsSuccessStatusCode)
                         {
-                            Frame rootFrame = Window.Current.Content as Frame;
-                            rootFrame.Navigate(typeof(RidesPage));
+                            GoToRidesPage();
                         }
                         else
                         {
                             if (await Helpers.AuthHelper.UserSignIn())
                             {
-                                Frame rootFrame = Window.Current.Content as Frame;
-                                rootFrame.Navigate(typeof(RidesPage));
+                                GoToRidesPage();
                             }
                         }
                     }
@@ -85,20 +83,51 @@ namespace LyftUWP
                     {
                         if (await AuthHelper.UserSignIn())
                         {
-                            Frame rootFrame = Window.Current.Content as Frame;
-                            rootFrame.Navigate(typeof(RidesPage));
+                            GoToRidesPage();
                         }
                     }               
+                }
+                else
+                {
+                    if (await Helpers.AuthHelper.UserSignIn())
+                    {
+                        GoToRidesPage();
+                    }
                 }
             }
             else
             {
                 if (await Helpers.AuthHelper.UserSignIn())
                 {
-                    Frame rootFrame = Window.Current.Content as Frame;
-                    rootFrame.Navigate(typeof(RidesPage));
+                    GoToRidesPage();
                 }
             }            
+        }
+
+        private async void GoToRidesPage()
+        {
+            Geoposition pos = await GetUserLocation();
+            Frame rootFrame = Window.Current.Content as Frame;
+            rootFrame.Navigate(typeof(RidesPage), pos);
+        }
+
+        private async Task<Geoposition> GetUserLocation()
+        {
+            Geolocator _geolocator = null;
+            var accessStatus = await Geolocator.RequestAccessAsync();
+            double lat = 0;
+            double lng = 0;
+            if (accessStatus == GeolocationAccessStatus.Allowed)
+            {
+                _geolocator = new Geolocator { ReportInterval = 5000, DesiredAccuracyInMeters = 200 };
+               // _geolocator.PositionChanged += _geolocator_PositionChanged;
+                Geoposition pos = await _geolocator.GetGeopositionAsync();
+                lat = pos.Coordinate.Point.Position.Latitude;
+                lng = pos.Coordinate.Point.Position.Longitude;
+                return pos;
+                //_geolocator.StatusChanged += _geolocator_StatusChanged;               
+            }
+            return null;
         }
     }
 }
