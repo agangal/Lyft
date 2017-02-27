@@ -80,5 +80,21 @@ namespace LyftUWP.Helpers
                 return null;
             }
         }
+
+        public static async Task<HttpResponseMessage> PutRequest(string api, string data)
+        {
+            HttpClient httpclient = new HttpClient();
+            try
+            {
+                httpclient.DefaultRequestHeaders.Authorization = new Windows.Web.Http.Headers.HttpCredentialsHeaderValue("Bearer", Settings.ACCESS_TOKEN);
+                httpclient.DefaultRequestHeaders.Accept.Add(new HttpMediaTypeWithQualityHeaderValue("application/json"));
+                HttpResponseMessage httpresponsemessage = await httpclient.PutAsync(new Uri(api), new HttpStringContent(data));
+                return httpresponsemessage;
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
     }
 }
