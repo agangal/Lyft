@@ -24,7 +24,9 @@ namespace LyftUWP.Helpers
         public static async Task<bool> PresetRideTypes(double lat, double lng)
         {
             string api = "https://api.lyft.com/v1/sandbox/ridetypes";
-            string data = "{\"lat\" :" + lat.ToString() + ", \"lng\":" + lng.ToString() + ",\"ride_types\":[\"lyft\", \"lyft_line\"]}";
+            string lat_String = lat.ToString();
+            string lng_String = lng.ToString();
+            string data = "{\"lat\" :" + lat_String + ", \"lng\":" + lng_String + ",\"ride_types\":[\"lyft\", \"lyft_line\"]}";
             HttpResponseMessage message = await URIHelper.PutRequest(api, data);
             if (message.IsSuccessStatusCode)
             {
@@ -36,10 +38,12 @@ namespace LyftUWP.Helpers
         public static async Task<bool> SetRideTypeAvailability(double lat, double lng, string ride_types, bool available)
         {
             string api = "https://api.lyft.com/v1/sandbox/ridetypes/" + ride_types;
-            string data = "{\"lat\" :" + lat.ToString() + ", \"lng\":" + lng.ToString() + ",\"driver_availability\":true}";           
+            string lat_String = lat.ToString();
+            string lng_String = lng.ToString();
+            string data = "{\"lat\" :" + lat_String + ", \"lng\":" + lng_String + ",\"driver_availability\": true}";           
             if (!available)
             {
-                data = "{\"lat\" :" + lat.ToString() + ", \"lng\":" + lng.ToString() + ",\"driver_availability\":false}";
+                data = "{\"lat\" :" + lat_String + ", \"lng\":" + lng_String + ",\"driver_availability\": false}";
             }
             HttpResponseMessage message = await URIHelper.PutRequest(api, data);
             if (message.IsSuccessStatusCode)

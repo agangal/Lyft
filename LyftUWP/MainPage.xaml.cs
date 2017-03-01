@@ -45,7 +45,14 @@ namespace LyftUWP
                 }
                 else
                 {
-                    message = await AuthHelper.RefreshAccessToken();
+                    if (Settings.USE_SANDBOX)
+                    {
+                        message = await AuthHelper.RefreshSandboxAccessToken();
+                    }
+                    else
+                    {
+                        message = await AuthHelper.RefreshAccessToken();
+                    }
                     if (message != null && message.IsSuccessStatusCode)
                     {
                         GoToRidesPage();
@@ -66,7 +73,14 @@ namespace LyftUWP
                 {
                     if (!String.IsNullOrEmpty(Settings.REFRESH_TOKEN))
                     {
-                        message = await AuthHelper.RefreshAccessToken();
+                        if (Settings.USE_SANDBOX)
+                        {
+                            message = await AuthHelper.RefreshSandboxAccessToken();
+                        }
+                        else
+                        {
+                            message = await AuthHelper.RefreshAccessToken();
+                        }
                         if (message != null && message.IsSuccessStatusCode)
                         {
                             GoToRidesPage();
@@ -107,6 +121,8 @@ namespace LyftUWP
         private async void GoToRidesPage()
         {
             Geoposition pos = await GetUserLocation();
+            //await SandboxHelper.PresetRideTypes(pos.Coordinate.Point.Position.Latitude, pos.Coordinate.Point.Position.Longitude);
+            //SandboxHelper.LyftLineAvailablity(true, pos.Coordinate.Point.Position.Latitude, pos.Coordinate.Point.Position.Longitude);
             Frame rootFrame = Window.Current.Content as Frame;
             rootFrame.Navigate(typeof(RidesPage), pos);
         }
