@@ -86,9 +86,10 @@ namespace LyftUWP.Helpers
             HttpClient httpclient = new HttpClient();
             try
             {
+                var httpcontent = new HttpStringContent(data, Windows.Storage.Streams.UnicodeEncoding.Utf8, "application/json");
                 httpclient.DefaultRequestHeaders.Authorization = new Windows.Web.Http.Headers.HttpCredentialsHeaderValue("Bearer", Settings.ACCESS_TOKEN);
                 httpclient.DefaultRequestHeaders.Accept.Add(new HttpMediaTypeWithQualityHeaderValue("application/json"));
-                HttpResponseMessage httpresponsemessage = await httpclient.PutAsync(new Uri(api), new HttpStringContent(data));
+                HttpResponseMessage httpresponsemessage = await httpclient.PutAsync(new Uri(api), httpcontent);
                 return httpresponsemessage;
             }
             catch (Exception ex)
